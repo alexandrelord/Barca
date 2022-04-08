@@ -33,7 +33,9 @@ body {
     display: inline-block;
     height: 65px;
     width: 65px;
-    border-radius: 5px;
+    /* border-radius: 5px; */
+    align-items: center;
+    font-size: 65px;
 }
 
 .square:hover {
