@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* css custom properties
+:root {
+
+} */
+
+body {
+    min-height: 100vh;
+}
+
+.board {
+    display: inline-block;
+    /* flex-wrap: wrap; */
+    width: 650px;
+    height: 650px;
+    /* gap: 25px; */
+
+}
+
+.row {
+    display: flex;
+    width: 650px;
+    height: 65px;
+    /* gap: 15px; */
+}
+
+.square {
+    display: inline-block;
+    height: 65px;
+    width: 65px;
+    border-radius: 5px;
+}
+
+.square:hover {
+    filter: brightness(85%);
+}
