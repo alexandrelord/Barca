@@ -9,10 +9,10 @@ let board
 let turn = 1
 
 /*----- cached element references -----*/
-// const squareEls = document.querySelectorAll('.square')
+const boardEl = document.querySelector('.board')
 
 /*----- event listeners -----*/
-document.querySelector('.board').addEventListener('click', function(evt) {
+boardEl.addEventListener('click', function(evt) {
     let squareId = evt.target.id
     let idx1, idx2
     if (parseInt(squareId) < 10) {
@@ -22,8 +22,35 @@ document.querySelector('.board').addEventListener('click', function(evt) {
         idx1 = parseInt(squareId.charAt(0))
         idx2 = parseInt(squareId.charAt(1))
     }
-    highlightPiece(idx1, idx2, evt, turn)
+    //changeIdx(evt)
+    removeHighlight()
+    addHighlight(idx1, idx2, evt, turn)
+    move(idx1, idx2)
 })
+
+function changeIdx(evt) {
+    let squareId = evt.target.id
+}
+
+function move(idx1, idx2) {
+    // check possible moves
+    // get piece obj
+    // if mouse - moves are up/down || left/right
+    let pieceClicked = board[idx1][idx2]
+    if (pieceClicked.piece === 'M' && pieceClicked.player === turn) {
+        checkRow(idx1, pieceClicked)
+        //checkColumn()
+    }
+}
+
+function checkRow(idx1, pieceClicked) {
+    
+    let rightRow = 
+    // let row = board[idx1].filter(square => square.occupied === true && square.idx !== pieceClicked.idx)
+    
+    
+}
+
 
 /*----- functions -----*/
 initialize()
@@ -35,7 +62,7 @@ function initialize() {
     renderOasis()
     renderPieces()
 }
-// find elegant method to create an nth-dimensional array
+// find elegant method to create a multi-dimensional array
 function createBoardArray() {
     board = [
       [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
@@ -47,7 +74,13 @@ function createBoardArray() {
       [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
       [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
       [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }]]
+      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }]
+    ]
+    let count = 0
+    board.forEach(subArr => subArr.forEach(square => {
+        square.idx = count
+        count++  
+    }))
   }
 
 function setUpPieces() {
@@ -85,15 +118,15 @@ function renderBoard() {
             // for each new row; reverse color scheme
             if (i % 2) {
                 if (j % 2) {
-                    square.style.backgroundColor = '#f5deb3'
+                    square.style.backgroundColor = '#f5deb3' // light wheat
                 } else {
-                    square.style.backgroundColor = '#d9a420'
+                    square.style.backgroundColor = '#d9a420' // dark wheat
                 }
             } else {
                 if (j % 2) {
-                    square.style.backgroundColor = '#d9a420'
+                    square.style.backgroundColor = '#d9a420' // dark wheat
                 } else {
-                    square.style.backgroundColor = '#f5deb3'
+                    square.style.backgroundColor = '#f5deb3' // light wheat
                 }
             }
             row.appendChild(square)
@@ -129,13 +162,14 @@ function renderPieces() {
     startWhiteMice.forEach(ele => ele.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")')    
 }
 
-function highlightPiece(idx1, idx2, evt, turn) {
-    let arrObj = board[idx1][idx2]
-    // if a square is already highlighted, remove highlight before highlighting new square
+function removeHighlight() {
+    // remove highlighted piece before highlighting another
+    if (document.querySelector('.highlight')) document.querySelector('.highlight').classList.remove('highlight')
+}
 
-    if (document.getElementById(evt.target.id).classList.contains('highlight')) {
-        document.getElementById(evt.target.id).classList.remove('highlight')
-    } else if (arrObj.piece && arrObj.player === turn) {
+function addHighlight(idx1, idx2, evt, turn) {
+    let arrObj = board[idx1][idx2]
+    if (arrObj.piece && arrObj.player === turn) {
         document.getElementById(evt.target.id).classList.add('highlight')
     }
 }
