@@ -6,17 +6,24 @@ const player2 = -1
 
 /*----- app's state (variables) -----*/
 let board
+let turn = 1
 
 /*----- cached element references -----*/
 // const squareEls = document.querySelectorAll('.square')
 
 /*----- event listeners -----*/
-// squareEls.forEach(function(squareEl) {
-//     squareEl.addEventListener('click', function(){
-//         if (squareEl.style.backgroundImage) squareEl.style.backgroundColor = 'green'
-//     })
-// })
-
+document.querySelector('.board').addEventListener('click', function(evt) {
+    let squareId = evt.target.id
+    let idx1, idx2
+    if (parseInt(squareId) < 10) {
+        idx1 = 0
+        idx2 = parseInt(squareId)
+    } else {
+        idx1 = parseInt(squareId.charAt(0))
+        idx2 = parseInt(squareId.charAt(1))
+    }
+    highlightPiece(idx1, idx2, evt, turn)
+})
 
 /*----- functions -----*/
 initialize()
@@ -47,7 +54,7 @@ function setUpPieces() {
     // copies properties from source object to target object => Object.assign(target, source)
     // Player 1
     Object.assign(board[0][4], {player: 1, piece: 'E', occupied: true})
-    Object.assign(board[0][6], {player: 1, piece: 'E', occupied: true})
+    Object.assign(board[0][5], {player: 1, piece: 'E', occupied: true})
     Object.assign(board[1][3], {player: 1, piece: 'L', occupied: true})
     Object.assign(board[1][6], {player: 1, piece: 'L', occupied: true})
     Object.assign(board[1][4], {player: 1, piece: 'M', occupied: true})
@@ -101,18 +108,18 @@ function renderOasis() {
     let oasisEls = [ document.getElementById('33'), document.getElementById('36'), document.getElementById('63'), document.getElementById('66')]
     oasisEls.forEach(oasisEl => {
         oasisEl.style.backgroundColor = '#2387bf'
-        oasisEl.style.borderRadius = '50%'
+        // oasisEl.style.borderRadius = '50%'
     })   
 }
 
 function renderPieces() {
     // render pieces and add them to starting squares
-    let startBlackEles = [document.getElementById('4'), document.getElementById('5')]
-    startBlackEles.forEach(ele => ele.style.backgroundImage = 'url("img/black/ELEFANTE.png")')
-    let startBlackLions = [document.getElementById('13'), document.getElementById('16')]
-    startBlackLions.forEach(ele => ele.style.backgroundImage = 'url("img/black/LEON.png")')
-    let startBlackMice = [document.getElementById('14'), document.getElementById('15')]
-    startBlackMice.forEach(ele => ele.style.backgroundImage = 'url("img/black/RATON.png")')
+    let blkElephantEls = [document.getElementById('4'), document.getElementById('5')]
+    blkElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/ELEFANTE.png")')
+    let blkLionEls = [document.getElementById('13'), document.getElementById('16')]
+    blkLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/LEON.png")')
+    let blkMouseEls = [document.getElementById('14'), document.getElementById('15')]
+    blkMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/RATON.png")')
     
     let startWhiteEles = [document.getElementById('94'), document.getElementById('95')]
     startWhiteEles.forEach(ele => ele.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")')
@@ -120,4 +127,15 @@ function renderPieces() {
     startWhiteLions.forEach(ele => ele.style.backgroundImage = 'url("img/white/LEON_BLANCO.png")')
     let startWhiteMice = [document.getElementById('84'), document.getElementById('85')]
     startWhiteMice.forEach(ele => ele.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")')    
+}
+
+function highlightPiece(idx1, idx2, evt, turn) {
+    let arrObj = board[idx1][idx2]
+    // if a square is already highlighted, remove highlight before highlighting new square
+
+    if (document.getElementById(evt.target.id).classList.contains('highlight')) {
+        document.getElementById(evt.target.id).classList.remove('highlight')
+    } else if (arrObj.piece && arrObj.player === turn) {
+        document.getElementById(evt.target.id).classList.add('highlight')
+    }
 }
