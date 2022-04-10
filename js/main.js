@@ -6,50 +6,92 @@ const player2 = -1
 let board
 let turn = 1
 let currentPossibleMoves = []
+let selectedPiece
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
 
+
 /*----- event listeners -----*/
+boardEl.addEventListener('click', handleClick)
 
-boardEl.addEventListener('click', function(evt) {
-    let squareId = evt.target.id
-    let idx1, idx2
-    if (parseInt(squareId) < 10) {
-        idx1 = 0
-        idx2 = parseInt(squareId)
-    } else {
-        idx1 = parseInt(squareId.charAt(0))
-        idx2 = parseInt(squareId.charAt(1))
+function handleClick(evt) {
+   
+    let squareIdEl = convertId(evt)
+    let row = squareIdEl[0]
+    let column = squareIdEl[1]
+
+    // check to see if clicked square has a selected player piece
+    if (board[row][column].occupied && board[row][column].player === turn) {
+        selectedPiece = [evt.target, row, column]
+        removeHighlight()
+        addHighlight(selectedPiece)
+        currentPossibleMoves = possibleMoves(row, column)
     }
-    //changeIdx(evt)
-    removeHighlight()
-    addHighlight(idx1, idx2, evt, turn)
-    currentPossibleMoves = possibleMoves(idx1, idx2)
-
-    // currentPossibleMoves.forEach(element =>
-    //     element.addEventListener('click', function() {
-    //         console.log('dude')
-    //     }))
+    // call move function if piece was selected
+    if (selectedPiece[0] !== evt.target) {
+        move(evt, selectedPiece)
+        
+    } 
     
-    // addEventListener('click', function(evt) {
-    //     let squareId = evt.target.id
-    //     let idx1, idx2
-    // if (parseInt(squareId) < 10) {
-    //     idx1 = 0
-    //     idx2 = parseInt(squareId)
-    // } else {
-    //     idx1 = parseInt(squareId.charAt(0))
-    //     idx2 = parseInt(squareId.charAt(1))
-    // }
-    // let squareClicked = board[idx1][idx2]
-    //     squareClicked.style.backgroundImage = 'url("img/black/RATON.png")'
+}
 
-    // }))
-})
+function move(evt, selectedPiece) {
+    let destination = convertId(evt)
+    
+    let x = selectedPiece[1]
+    let y = selectedPiece[2]
 
-// function changeIdx(evt) {
-//     let squareId = evt.target.id
-// }
+    if (evt.target.classList.contains('move')) {
+        // for player 1
+        if (board[x][y].piece === 'E' && turn === 1) {
+        evt.target.style.backgroundImage = 'url("img/black/ELEFANTE.png")'
+        selectedPiece[0].style.backgroundImage = ''
+        } else if (board[x][y].piece === 'L' && turn === 1) {
+            evt.target.style.backgroundImage = 'url("img/black/LEON.png")'
+            selectedPiece[0].style.backgroundImage = ''
+        } else if (board[x][y].piece === 'M' && turn === 1) {
+            evt.target.style.backgroundImage = 'url("img/black/RATON.png")'
+            selectedPiece[0].style.backgroundImage = ''
+        }
+        // for player 2
+        if (board[x][y].piece === 'E' && turn === -1) {
+            evt.target.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")'
+            selectedPiece[0].style.backgroundImage = ''
+            } else if (board[x][y].piece === 'L' && turn === -1) {
+                evt.target.style.backgroundImage = 'url("img/white/LEON_BLANCO.png")'
+                selectedPiece[0].style.backgroundImage = ''
+            } else if (board[x][y].piece === 'M' && turn === -1) {
+                evt.target.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")'
+                selectedPiece[0].style.backgroundImage = ''
+            }
+            
+        removeHighlight()
+        changeArrPosition(selectedPiece, destination)
+        changeTurn()
+    }
+}
+
+function changeTurn() {
+    if (turn === 1) turn = -1
+    else turn = 1
+}
+
+function changeArrPosition(selectedPiece, destination) {
+    let oldRow = selectedPiece[1]
+    let oldColumn =  selectedPiece[2]
+    let newRow = destination[0]
+    let newColumn = destination[1]
+
+    let oldObj = board[oldRow][oldColumn]
+    let newObj = board[newRow][newColumn]
+
+    Object.keys(oldObj).forEach(function(key) {
+        if(key !== 'idx') newObj[key] = oldObj[key]
+    })
+    Object.assign(oldObj, {player: null, piece: null, occupied: null})
+    
+}
+
 
 function possibleMoves(idx1, idx2) {
     let rowMoves
@@ -82,7 +124,6 @@ function possibleMoves(idx1, idx2) {
 function checkDiagonals(pieceClicked) {
     let diagonalMoves = []
     let row, column, strIdx
-    console.log(pieceClicked.idx)
 
     if (pieceClicked.idx < 10) {
         row = 0
@@ -266,16 +307,16 @@ function renderOasis() {
         oasisEl.style.backgroundColor = '#2387bf'
     })   
 }
-
+// render pieces and add them to starting squares
 function renderPieces() {
-    // render pieces and add them to starting squares
+    // player 1
     let blkElephantEls = [document.getElementById('4'), document.getElementById('5')]
     blkElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/ELEFANTE.png")')
     let blkLionEls = [document.getElementById('13'), document.getElementById('16')]
     blkLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/LEON.png")')
     let blkMouseEls = [document.getElementById('14'), document.getElementById('15')]
     blkMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/RATON.png")')
-    
+    // player 2
     let startWhiteEles = [document.getElementById('94'), document.getElementById('95')]
     startWhiteEles.forEach(ele => ele.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")')
     let startWhiteLions = [document.getElementById('83'), document.getElementById('86')]
@@ -293,10 +334,26 @@ function removeHighlight() {
     if (highLightMoves) highLightMoves.forEach(squareEl => squareEl.classList.remove('move'))
     
 }
-
-function addHighlight(idx1, idx2, evt, turn) {
-    let arrObj = board[idx1][idx2]
+// highlight piece if clicked
+function addHighlight(selectedPiece) {
+    let row = selectedPiece[1]
+    let column = selectedPiece[2]
+    let arrObj = board[row][column]
     if (arrObj.piece && arrObj.player === turn) {
-        document.getElementById(evt.target.id).classList.add('highlight')
+        document.getElementById(selectedPiece[0].id).classList.add('highlight')
     }
+}
+// convert square ele id from string to num to access board array
+function convertId(evt) {
+    let arrAxis = []
+    let rowNum, columnNum
+    if (parseInt(evt.target.id) < 10) {
+        rowNum = 0
+        columnNum = parseInt(evt.target.id)
+    } else {
+        rowNum = parseInt(evt.target.id.charAt(0))
+        columnNum = parseInt(evt.target.id.charAt(1))
+    }
+    arrAxis.push(rowNum, columnNum)
+    return arrAxis 
 }
