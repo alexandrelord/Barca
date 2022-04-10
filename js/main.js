@@ -67,8 +67,39 @@ function move(evt, selectedPiece) {
             
         removeHighlight()
         changeArrPosition(selectedPiece, destination)
+        winlogic()
         changeTurn()
     }
+}
+
+function winlogic() {
+    let oasis1 = board[3][3]
+    let oasis2 = board[3][6]
+    let oasis3 = board[6][3]
+    let oasis4 = board[6][6]
+
+    let result
+
+    if (oasis1.occupied && oasis1.player === turn) {
+        if (oasis2.occupied && oasis2.player === turn) {
+            if (oasis3.occupied && oasis3.player === turn) {
+                result = true
+            }
+        } else if (oasis3.occupied && oasis3.player === turn) {
+            if (oasis4.occupied && oasis4.player === turn) {
+                result = true
+            }
+        }
+    } else if (oasis2.occupied && oasis2.player === turn) {
+        if (oasis3.occupied && oasis3.player === turn) {
+            if (oasis4.occupied && oasis4.player === turn) {
+                result = true
+            }
+        }
+    }
+    
+    if (result === true) console.log(`Player${turn} wins!!`)
+    
 }
 
 function changeTurn() {
@@ -209,7 +240,6 @@ function checkRow(idx1, pieceClicked) {
         }
         else break
     }
-
     // connect possible row moves to piece
     rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return rowMoves
@@ -221,7 +251,7 @@ initialize()
 
 function initialize() {
     createBoardArray()
-    setUpPieces()
+    setUpPieceEls()
     renderBoard()
     renderOasis()
     renderPieces()
@@ -247,7 +277,7 @@ function createBoardArray() {
     }))
   }
 
-function setUpPieces() {
+function setUpPieceEls() {
     // copies properties from source object to target object => Object.assign(target, source)
     // Player 1
     Object.assign(board[0][4], {player: 1, piece: 'E', occupied: true})
