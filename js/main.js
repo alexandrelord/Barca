@@ -4,19 +4,18 @@ const player2 = -1
 
 /*----- app's state (variables) -----*/
 let board
-let turn = -1
-let currentPossibleMoves = []
+let turn = 1
+
 let selectedPiece
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
-
 
 /*----- event listeners -----*/
 boardEl.addEventListener('click', handleClick)
 
 function handleClick(evt) {
    
-    let squareIdEl = convertId(evt)
+    let squareIdEl = convertElId(evt)
     let row = squareIdEl[0]
     let column = squareIdEl[1]
 
@@ -25,18 +24,17 @@ function handleClick(evt) {
         selectedPiece = [evt.target, row, column]
         removeHighlight()
         addHighlight(selectedPiece)
-        currentPossibleMoves = possibleMoves(row, column)
+        possibleMoves(row, column)
     }
     // call move function if piece was selected
     if (selectedPiece[0] !== evt.target) {
         move(evt, selectedPiece)
-        
     } 
     
 }
 
 function move(evt, selectedPiece) {
-    let destination = convertId(evt)
+    let destination = convertElId(evt)
     
     let x = selectedPiece[1]
     let y = selectedPiece[2]
@@ -67,9 +65,15 @@ function move(evt, selectedPiece) {
             
         removeHighlight()
         changeArrPosition(selectedPiece, destination)
-        winlogic()
+        // instigate feared state to nearby animal
+        addFear(destination)
+        checkWinner()
         changeTurn()
     }
+}
+
+function addFear(destination) {
+    
 }
 
 function changeArrPosition(selectedPiece, destination) {
@@ -88,47 +92,44 @@ function changeArrPosition(selectedPiece, destination) {
     
 }
 
-function checkFearedPcs(piece) {
-    
+// function finds index of feared animals for selected piece
+function findFearedAnimals(piece) {
+    // create variable that will hold idxs of feared animal
+    let fearedAnimals = []
+    // check idx of feared animal from opposite player
     if (piece === 'M') {
-        let oppLions = []
         board.forEach(subArr => subArr.forEach(obj => {
            if (obj.piece === 'L' && obj.player !== turn) {
-            oppLions.push(obj.idx)
+               fearedAnimals.push(obj.idx)
            }
         }))
-        //console.log(oppLions)
-        return oppLions
     } else if (piece === 'L') {
-        let oppElephants = []
         board.forEach(subArr => subArr.forEach(obj => {
             if (obj.piece === 'E' && obj.player !== turn) {
-             oppElephants.push(obj.idx)
+             fearedAnimals.push(obj.idx)
             }
          }))
-         // console.log(oppElephants)
-         return oppElephants
     } else {
-        let oppMice = []
         board.forEach(subArr => subArr.forEach(obj => {
             if (obj.piece === 'M' && obj.player !== turn) {
-             oppMice.push(obj.idx)
+             fearedAnimals.push(obj.idx)
             }
          }))
-         // console.log(oppMice)
-         return oppMice
     }
-
+    // return array of feared animals' idxs
+    return fearedAnimals
 }
-
+// define the adjacent square next to feared animals
+// need to apply DRY solution!!
 function activateFearSqr(fearedSqr) {
     let arr1 = []
     let arr2 = []
-    let fear = []
-    // fearedSqr is an array of idxs
+    let fearedSqrs = []
+    
     let firstFeared = fearedSqr[0].toString()
     let secondFeared = fearedSqr[1].toString()
     
+    // check if this can be done with checkId function
     let rowNum1, columnNum1
     if (parseInt(firstFeared) < 10) {
         rowNum1 = 0
@@ -145,179 +146,115 @@ function activateFearSqr(fearedSqr) {
         rowNum2 = parseInt(secondFeared.charAt(0))
         columnNum2 = parseInt(secondFeared.charAt(1))
     }
-    
-    //add row below
+    // first feared animal
+    // add row above visually
     if (board[rowNum1 - 1] >= board[0]) {
-        arr1.push(board[rowNum1 - 1][columnNum1 - 1].idx, board[rowNum1 - 1][columnNum1].idx, board[rowNum1 - 1][columnNum1 + 1].idx)
+        if (board[rowNum1 - 1][columnNum1 - 1] >= board[rowNum1 - 1][0]) {
+            arr1.push(board[rowNum1 - 1][columnNum1 - 1].idx)
+        }
+        if (board[rowNum1 - 1][columnNum1 + 1] <= board[rowNum1 - 1][9]) {
+            arr1.push(board[rowNum1 - 1][columnNum1 + 1].idx)
+        }
+        arr1.push(board[rowNum1 - 1][columnNum1].idx)
     }
-    // add row above
+    // add row below visually
     if (board[rowNum1 + 1] <= board[9]) {
-        arr1.push(board[rowNum1 + 1][columnNum1 - 1].idx, board[rowNum1 + 1][columnNum1].idx, board[rowNum1 + 1][columnNum1 + 1].idx)
+        if (board[rowNum1 + 1][columnNum1 - 1] >= board[rowNum1 + 1][0]) {
+            arr1.push(board[rowNum1 + 1][columnNum1 - 1].idx)
+        }
+        if (board[rowNum1 + 1][columnNum1 + 1] <= board[rowNum1 + 1][9]) {
+            arr1.push(board[rowNum1 + 1][columnNum1 + 1].idx)
+        } 
+        arr1.push(board[rowNum1 + 1][columnNum1].idx)
+        
     }
     // add middle row
-    if (board[rowNum1][columnNum1] <= board[rowNum1][9]) {
-        arr1.push(board[rowNum1][columnNum1 + 1].idx)
+    if (board[rowNum1][columnNum1 + 1] <= board[rowNum1][9]) {
+            arr1.push(board[rowNum1][columnNum1 + 1].idx)
     }
-    if (board[rowNum1][columnNum1] >= board[rowNum1][0]) {
-        arr1.push(board[rowNum1][columnNum1 - 1].idx)
+    if (board[rowNum1][columnNum1 - 1] >= board[rowNum1][0]) {
+            arr1.push(board[rowNum1][columnNum1 - 1].idx) 
     }
-    //add row below
+    // second feared animal
+    // add row above visually
     if (board[rowNum2 - 1] >= board[0]) {
-        arr2.push(board[rowNum2 - 1][columnNum2 - 1].idx, board[rowNum2 - 1][columnNum2].idx, board[rowNum2 - 1][columnNum2 + 1].idx)
+        if (board[rowNum2 - 1][columnNum2 - 1] >= board[rowNum2 - 1][0]) {
+            arr2.push(board[rowNum2 - 1][columnNum2 - 1].idx)
+        }
+        if (board[rowNum2 - 1][columnNum2 + 1] <= board[rowNum2 - 1][9]) {
+            arr2.push(board[rowNum2 - 1][columnNum2 + 1].idx)
+        } 
+        arr2.push(board[rowNum2 - 1][columnNum2].idx)
+        
     }
-    // add row above
+    // add row below visually
     if (board[rowNum2 + 1] <= board[9]) {
-        arr2.push(board[rowNum2 + 1][columnNum2 - 1].idx, board[rowNum2 + 1][columnNum2].idx, board[rowNum2 + 1][columnNum2 + 1].idx)
+        if (board[rowNum2 + 1][columnNum2 - 1] >= board[rowNum2 + 1][0]) {
+            arr2.push(board[rowNum2 + 1][columnNum2 - 1].idx)
+        }
+        if (board[rowNum2 + 1][columnNum2 + 1] <= board[rowNum2 + 1][9]) {
+            arr2.push(board[rowNum2 + 1][columnNum2 + 1].idx)
+        }
+        arr2.push(board[rowNum2 + 1][columnNum2].idx)
+        
     }
     // add middle row
-    if (board[rowNum2][columnNum2] <= board[rowNum2][9]) {
-        arr2.push(board[rowNum2][columnNum2 + 1].idx)
+    if (board[rowNum2][columnNum2 + 1] <= board[rowNum2][9]) {
+            arr2.push(board[rowNum2][columnNum2 + 1].idx)
     }
-    if (board[rowNum2][columnNum2] >= board[rowNum2][0]) {
-        arr2.push(board[rowNum2][columnNum2 - 1].idx)
+    if (board[rowNum2][columnNum2 - 1] >= board[rowNum2][0]) {
+            arr2.push(board[rowNum2][columnNum2 - 1].idx) 
     }
 
-    fear = [...arr1, ...arr2]
-    // console.log(fear)
-    return fear
+    fearedSqrs = [...arr1, ...arr2]
+    // return array of feared squares
+    return fearedSqrs
        
 }
 
-
+// define possible moves for each selected piece
 function possibleMoves(idx1, idx2) {
     let rowMoves
     let columnMoves
     let diagonalMoves
     let moves
-    let fearedSqr
-    let fears
+    let fearedAnimalId
+    let fearedSqrs
     let results = []
-    // if mouse - moves are up/down || left/right
-    let pieceClicked = board[idx1][idx2]
-    if (pieceClicked.piece === 'M' && pieceClicked.player === turn) {
-        rowMoves = checkRow(idx1, pieceClicked)
+    let selectedPiece = board[idx1][idx2]
+
+    // define possible moves for mice
+    if (selectedPiece.piece === 'M' && selectedPiece.player === turn) {
+        rowMoves = checkRow(idx1, selectedPiece)
         columnMoves = checkColumn(idx1, idx2)
-        fearedSqr = checkFearedPcs(pieceClicked.piece)
-        fears = activateFearSqr(fearedSqr)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
         moves = [...rowMoves, ...columnMoves]
-        results = moves.filter(ele => !fears.includes(ele))
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
         results.forEach(element => document.getElementById(element).classList.add('move'))
-        return results
     }
-    if (pieceClicked.piece === 'L' && pieceClicked.player === turn) {
-        diagonalMoves = checkDiagonals(pieceClicked)
-        fearedSqr = checkFearedPcs(pieceClicked.piece)
-        fears = activateFearSqr(fearedSqr)
-        results = diagonalMoves.filter(ele => !fears.includes(ele))
+    // define possible moves for lions
+    if (selectedPiece.piece === 'L' && selectedPiece.player === turn) {
+        moves = checkDiagonals(selectedPiece)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
         results.forEach(element => document.getElementById(element).classList.add('move'))
-        return results
     }
-    if (pieceClicked.piece === 'E' && pieceClicked.player === turn) {
-        rowMoves = checkRow(idx1, pieceClicked)
+    // define possible moves for elephants
+    if (selectedPiece.piece === 'E' && selectedPiece.player === turn) {
+        rowMoves = checkRow(idx1, selectedPiece)
         columnMoves = checkColumn(idx1, idx2)
-        diagonalMoves = checkDiagonals(pieceClicked)
-        fearedSqr = checkFearedPcs(pieceClicked.piece)
-        fears = activateFearSqr(fearedSqr)
+        diagonalMoves = checkDiagonals(selectedPiece)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
         moves = [...rowMoves, ...columnMoves, ...diagonalMoves]
-        results = moves.filter(ele => !fears.includes(ele))
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
         results.forEach(element => document.getElementById(element).classList.add('move'))
-        return results
-    }
-    
+    }  
 }
 
-function checkDiagonals(pieceClicked) {
-    let diagonalMoves = []
-    let row, column, strIdx
 
-    if (pieceClicked.idx < 10) {
-        row = 0
-        column = pieceClicked.idx
-    } else {
-        strIdx = String(pieceClicked.idx).split('')
-        row = parseInt(strIdx[0])
-        column = parseInt(strIdx[1])
-    }
-    
-    // diagonal up/left
-    for (let i = row - 1; i >= 0; i--) {
-        column--
-        if (i < 0 || column < 0) break
-        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)
-        else break  
-    }
-    // diagonal down/right
-    if (pieceClicked.idx < 10) column = pieceClicked.idx
-    else column = parseInt(strIdx[1])
-    for (let i = row + 1; i <= 9; i++) {
-        column++
-        if (i > 9 || column > 9) break
-        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)  
-        else break 
-    }
-    // diagonal up/right
-    if (pieceClicked.idx < 10) column = pieceClicked.idx
-    else column = parseInt(strIdx[1])
-    for (let i = row - 1; i >= 0; i--) {
-        column++
-        if (i < 0 || column > 9) break
-        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)   
-        else break
-    }
-    // // diagonal down/left
-    if (pieceClicked.idx < 10) column = pieceClicked.idx
-    else column = parseInt(strIdx[1])
-    for (let i = row + 1; i <= 9; i++) {
-        column--
-        if (i > 9 || column < 0) break
-        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)   
-        else break
-    }
-
-    // diagonalMoves.forEach(element => document.getElementById(element).classList.add('move'))
-    return diagonalMoves
-}
-
-function checkColumn(idx1, idx2) {
-    let columnMoves = []
-    //up check
-    for (let i = idx1 - 1; i >= 0; i--) {
-        if (board[i][idx2].occupied === null) {
-            columnMoves.push(board[i][idx2].idx)
-        } else break
-    }
-    // down check
-    for (let i = idx1 + 1; i <= 9; i++) {
-        if (board[i][idx2].occupied === null) {
-            columnMoves.push(board[i][idx2].idx)
-        } else break
-    }
-    // connect possible column moves to piece
-    // columnMoves.forEach(element => document.getElementById(element).classList.add('move'))
-    return columnMoves
-}
-            
-function checkRow(idx1, pieceClicked) {
-
-    let rowMoves = []
-    // left check
-    for (let i = pieceClicked.idx - board[idx1][0].idx - 1; i >= 0; i--) {
-        if (board[idx1][i].occupied === null) {
-            rowMoves.push(board[idx1][i].idx)
-        }
-        else break
-    }
-    // right check
-    for (let i = pieceClicked.idx - board[idx1][0].idx + 1; i <= (board[idx1][9].idx - board[idx1][0].idx); i++) {
-        if (board[idx1][i].occupied === null) {
-            rowMoves.push(board[idx1][i].idx)
-        }
-        else break
-    }
-    // connect possible row moves to piece
-    // rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
-    return rowMoves
-}
 
 
 /*----- functions -----*/
@@ -448,7 +385,7 @@ function addHighlight(selectedPiece) {
     }
 }
 // convert square ele id from string to num to access board array
-function convertId(evt) {
+function convertElId(evt) {
     let arrAxis = []
     let rowNum, columnNum
     if (parseInt(evt.target.id) < 10) {
@@ -462,12 +399,11 @@ function convertId(evt) {
     return arrAxis 
 }
 // check to see if there are at least 3 pieces from the same player on the oasis
-function winlogic() {
+function checkWinner() {
     let oasis1 = board[3][3]
     let oasis2 = board[3][6]
     let oasis3 = board[6][3]
     let oasis4 = board[6][6]
-
     let result
 
     if (oasis1.occupied && oasis1.player === turn) {
@@ -488,11 +424,103 @@ function winlogic() {
         }
     }
     
-    if (result === true) console.log(`Player${turn} wins!!`)
+    if (result === true) turn === 1 ? console.log('Player 1 wins!!') : console.log('Player 2 wins!!')
     
 }
 // switch players when turn ends
 function changeTurn() {
-    if (turn === 1) turn = -1
-    else turn = 1
+    turn === 1 ? turn = -1 : turn = 1
+}
+
+function checkDiagonals(pieceClicked) {
+    let diagonalMoves = []
+    let row, column, strIdx
+
+    if (pieceClicked.idx < 10) {
+        row = 0
+        column = pieceClicked.idx
+    } else {
+        strIdx = String(pieceClicked.idx).split('')
+        row = parseInt(strIdx[0])
+        column = parseInt(strIdx[1])
+    }
+    
+    // diagonal up/left
+    for (let i = row - 1; i >= 0; i--) {
+        column--
+        if (i < 0 || column < 0) break
+        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)
+        else break  
+    }
+    // diagonal down/right
+    if (pieceClicked.idx < 10) column = pieceClicked.idx
+    else column = parseInt(strIdx[1])
+    for (let i = row + 1; i <= 9; i++) {
+        column++
+        if (i > 9 || column > 9) break
+        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)  
+        else break 
+    }
+    // diagonal up/right
+    if (pieceClicked.idx < 10) column = pieceClicked.idx
+    else column = parseInt(strIdx[1])
+    for (let i = row - 1; i >= 0; i--) {
+        column++
+        if (i < 0 || column > 9) break
+        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)   
+        else break
+    }
+    // // diagonal down/left
+    if (pieceClicked.idx < 10) column = pieceClicked.idx
+    else column = parseInt(strIdx[1])
+    for (let i = row + 1; i <= 9; i++) {
+        column--
+        if (i > 9 || column < 0) break
+        if (board[i][column].occupied === null) diagonalMoves.push(board[i][column].idx)   
+        else break
+    }
+
+    // diagonalMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    return diagonalMoves
+}
+
+function checkColumn(idx1, idx2) {
+    let columnMoves = []
+    //up check
+    for (let i = idx1 - 1; i >= 0; i--) {
+        if (board[i][idx2].occupied === null) {
+            columnMoves.push(board[i][idx2].idx)
+        } else break
+    }
+    // down check
+    for (let i = idx1 + 1; i <= 9; i++) {
+        if (board[i][idx2].occupied === null) {
+            columnMoves.push(board[i][idx2].idx)
+        } else break
+    }
+    // connect possible column moves to piece
+    // columnMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    return columnMoves
+}
+            
+function checkRow(idx1, pieceClicked) {
+
+    let rowMoves = []
+    // left check
+    for (let i = pieceClicked.idx - board[idx1][0].idx - 1; i >= 0; i--) {
+        if (board[idx1][i].occupied === null) {
+            rowMoves.push(board[idx1][i].idx)
+        }
+        else break
+    }
+    // right check
+    for (let i = pieceClicked.idx - board[idx1][0].idx + 1; i <= (board[idx1][9].idx - board[idx1][0].idx); i++) {
+        if (board[idx1][i].occupied === null) {
+            rowMoves.push(board[idx1][i].idx)
+        }
+        else break
+    }
+    // connect possible row moves to piece
+    // rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    return rowMoves
 }
