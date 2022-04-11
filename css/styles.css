@@ -50,3 +50,7 @@ body {
 .move {
     border: 3px dashed purple;
 }
+
+.fear {
+    border: 3px solid red;
+}

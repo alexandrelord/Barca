@@ -5,8 +5,8 @@ const player2 = -1
 /*----- app's state (variables) -----*/
 let board
 let turn = 1
-
 let selectedPiece
+let fearedAnimals = []
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
 
@@ -18,11 +18,23 @@ function handleClick(evt) {
     let squareIdEl = convertElId(evt)
     let row = squareIdEl[0]
     let column = squareIdEl[1]
+    fearedAnimals = checkFear()
+
+    if (fearedAnimals.length > 0) {
+        // limit selected pieces to afraid ones
+        fearedAnimals.forEach(animal => {
+            document.getElementById(animal).classList.add('fear')
+        })
+    } 
+        // let highlight = document.querySelectorAll('.fear')
+        // if (highlight) highlight.forEach(squareEl => squareEl.classList.remove('fear'))
+    
 
     // check to see if clicked square has a selected player piece
     if (board[row][column].occupied && board[row][column].player === turn) {
         selectedPiece = [evt.target, row, column]
         removeHighlight()
+        
         addHighlight(selectedPiece)
         possibleMoves(row, column)
     }
@@ -52,13 +64,13 @@ function move(evt, selectedPiece) {
             selectedPiece[0].style.backgroundImage = ''
         }
         // for player 2
-        if (board[x][y].piece === 'E' && turn === -1) {
+        if (board[x][y].piece === 'E' &&  turn === -1) {
             evt.target.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")'
             selectedPiece[0].style.backgroundImage = ''
-            } else if (board[x][y].piece === 'L' && turn === -1) {
+            } else if (board[x][y].piece === 'L' &&  turn === -1) {
                 evt.target.style.backgroundImage = 'url("img/white/LEON_BLANCO.png")'
                 selectedPiece[0].style.backgroundImage = ''
-            } else if (board[x][y].piece === 'M' && turn === -1) {
+            } else if (board[x][y].piece === 'M' &&  turn === -1) {
                 evt.target.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")'
                 selectedPiece[0].style.backgroundImage = ''
             }
@@ -69,12 +81,168 @@ function move(evt, selectedPiece) {
         addFear(destination)
         checkWinner()
         changeTurn()
+        // check feared
+        //fearedAnimals = checkFear()
     }
 }
-
-function addFear(destination) {
+// check fear property
+function checkFear() {
+    let afraidAnimals = []
+    board.forEach(subArr => subArr.forEach(obj => {
+        if (obj.fear === true) {
+            afraidAnimals.push(obj.idx)
+        }
+    }))
     
+    return afraidAnimals
 }
+
+
+// add fear property to animal
+function addFear(destination) {
+    let row = destination[0]
+    let column = destination[1]
+    let piece = board[row][column].piece
+    // check for animals that fear the moved piece
+    // next to adjacent destination squares
+    // add row above
+    if (piece === 'M') {
+        // if row exist
+        if (board[row - 1] >= board[0]) {
+            //and square is not out of bounds
+            if (board[row - 1][column - 1] >= board[row - 1][0]) {
+                if (board[row - 1][column - 1].piece === 'E' && board[row - 1][column - 1].player !== turn) {
+                    board[row - 1][column - 1].fear = true
+                }
+            }
+            if (board[row - 1][column + 1] <= board[row - 1][9]) {
+                if (board[row - 1][column + 1].piece === 'E' && board[row - 1][column + 1].player !== turn) {
+                    board[row - 1][column + 1].fear = true
+                }
+            }
+            if (board[row - 1][column].piece === 'E' && board[row - 1][column].player !== turn) {
+                board[row - 1][column].fear = true
+            }
+        }
+        // add row below
+        if (board[row + 1] <= board[9]) {
+            if (board[row + 1][column - 1] >= board[row + 1][0]) {
+                if (board[row + 1][column - 1].piece === 'E' && board[row + 1][column - 1].player !== turn) {
+                    board[row + 1][column - 1].fear = true
+                }
+            }
+            if (board[row + 1][column + 1] <= board[row + 1][9]) {
+                if (board[row + 1][column + 1].piece === 'E' && board[row + 1][column + 1].player !== turn) {
+                    board[row + 1][column + 1].fear = true
+                }
+            }
+            if (board[row + 1][column].piece === 'E' && board[row + 1][column].player !== turn) {
+                board[row + 1][column].fear = true
+            }
+        }
+        if (board[row][column + 1] <= board[row][9]) {
+            if (board[row][column + 1].piece === 'E' && board[row][column + 1].player !== turn) {
+                board[row][column + 1].fear = true
+            }
+        }
+        if (board[row][column - 1] >= board[row][0]) {
+            if (board[row][column - 1].piece === 'E' && board[row][column - 1].player !== turn) {
+                board[row][column - 1].fear = true
+            }
+        }
+    } 
+    if (piece === 'L') {
+        // if row exist
+        if (board[row - 1] >= board[0]) {
+            //and square is not out of bounds
+            if (board[row - 1][column - 1] >= board[row - 1][0]) {
+                if (board[row - 1][column - 1].piece === 'M' && board[row - 1][column - 1].player !== turn) {
+                    board[row - 1][column - 1].fear = true
+                }
+            }
+            if (board[row - 1][column + 1] <= board[row - 1][9]) {
+                if (board[row - 1][column + 1].piece === 'M' && board[row - 1][column + 1].player !== turn) {
+                    board[row - 1][column + 1].fear = true
+                }
+            }
+            if (board[row - 1][column].piece === 'M' && board[row - 1][column].player !== turn) {
+                board[row - 1][column].fear = true
+            }
+        }
+        // add row below
+        if (board[row + 1] <= board[9]) {
+            if (board[row + 1][column - 1] >= board[row + 1][0]) {
+                if (board[row + 1][column - 1].piece === 'M' && board[row + 1][column - 1].player !== turn) {
+                    board[row + 1][column - 1].fear = true
+                }
+            }
+            if (board[row + 1][column + 1] <= board[row + 1][9]) {
+                if (board[row + 1][column + 1].piece === 'M' && board[row + 1][column + 1].player !== turn) {
+                    board[row + 1][column + 1].fear = true
+                }
+            }
+            if (board[row + 1][column].piece === 'M' && board[row + 1][column].player !== turn) {
+                board[row + 1][column].fear = true
+            }
+        }
+        if (board[row][column + 1] <= board[row][9]) {
+            if (board[row][column + 1].piece === 'M' && board[row][column + 1].player !== turn) {
+                board[row][column + 1].fear = true
+            }
+        }
+        if (board[row][column - 1] >= board[row][0]) {
+            if (board[row][column - 1].piece === 'M' && board[row][column - 1].player !== turn) {
+                board[row][column - 1].fear = true
+            }
+        }
+    } if (piece === 'E') {
+        // if row exist
+        if (board[row - 1] >= board[0]) {
+            //and square is not out of bounds
+            if (board[row - 1][column - 1] >= board[row - 1][0]) {
+                if (board[row - 1][column - 1].piece === 'L' && board[row - 1][column - 1].player !== turn) {
+                    board[row - 1][column - 1].fear = true
+                }
+            }
+            if (board[row - 1][column + 1] <= board[row - 1][9]) {
+                if (board[row - 1][column + 1].piece === 'L' && board[row - 1][column + 1].player !== turn) {
+                    board[row - 1][column + 1].fear = true
+                }
+            }
+            if (board[row - 1][column].piece === 'L' && board[row - 1][column].player !== turn) {
+                board[row - 1][column].fear = true
+            }
+        }
+        // add row below
+        if (board[row + 1] <= board[9]) {
+            if (board[row + 1][column - 1] >= board[row + 1][0]) {
+                if (board[row + 1][column - 1].piece === 'L' && board[row + 1][column - 1].player !== turn) {
+                    board[row + 1][column - 1].fear = true
+                }
+            }
+            if (board[row + 1][column + 1] <= board[row + 1][9]) {
+                if (board[row + 1][column + 1].piece === 'L' && board[row + 1][column + 1].player !== turn) {
+                    board[row + 1][column + 1].fear = true
+                }
+            }
+            if (board[row + 1][column].piece === 'L' && board[row + 1][column].player !== turn) {
+                board[row + 1][column].fear = true
+            }
+        }
+        if (board[row][column + 1] <= board[row][9]) {
+            if (board[row][column + 1].piece === 'L' && board[row][column + 1].player !== turn) {
+                board[row][column + 1].fear = true
+            }
+        }
+        if (board[row][column - 1] >= board[row][0]) {
+            if (board[row][column - 1].piece === 'L' && board[row][column - 1].player !== turn) {
+                board[row][column - 1].fear = true
+            }
+        }
+    } 
+}
+
+
 
 function changeArrPosition(selectedPiece, destination) {
     let oldRow = selectedPiece[1]
@@ -87,8 +255,12 @@ function changeArrPosition(selectedPiece, destination) {
 
     Object.keys(oldObj).forEach(function(key) {
         if(key !== 'idx') newObj[key] = oldObj[key]
+        if (key === 'fear') {
+            document.getElementById(oldObj.idx).classList.remove('fear')
+            newObj.fear = null
+        }
     })
-    Object.assign(oldObj, {player: null, piece: null, occupied: null})
+    Object.assign(oldObj, {player: null, piece: null, occupied: null, fear: null})
     
 }
 
@@ -99,19 +271,19 @@ function findFearedAnimals(piece) {
     // check idx of feared animal from opposite player
     if (piece === 'M') {
         board.forEach(subArr => subArr.forEach(obj => {
-           if (obj.piece === 'L' && obj.player !== turn) {
+           if (obj.piece === 'L' && obj.player !==  turn) {
                fearedAnimals.push(obj.idx)
            }
         }))
     } else if (piece === 'L') {
         board.forEach(subArr => subArr.forEach(obj => {
-            if (obj.piece === 'E' && obj.player !== turn) {
+            if (obj.piece === 'E' && obj.player !==  turn) {
              fearedAnimals.push(obj.idx)
             }
          }))
     } else {
         board.forEach(subArr => subArr.forEach(obj => {
-            if (obj.piece === 'M' && obj.player !== turn) {
+            if (obj.piece === 'M' && obj.player !==  turn) {
              fearedAnimals.push(obj.idx)
             }
          }))
@@ -122,8 +294,6 @@ function findFearedAnimals(piece) {
 // define the adjacent square next to feared animals
 // need to apply DRY solution!!
 function activateFearSqr(fearedSqr) {
-    let arr1 = []
-    let arr2 = []
     let fearedSqrs = []
     
     let firstFeared = fearedSqr[0].toString()
@@ -150,66 +320,64 @@ function activateFearSqr(fearedSqr) {
     // add row above visually
     if (board[rowNum1 - 1] >= board[0]) {
         if (board[rowNum1 - 1][columnNum1 - 1] >= board[rowNum1 - 1][0]) {
-            arr1.push(board[rowNum1 - 1][columnNum1 - 1].idx)
+            fearedSqrs.push(board[rowNum1 - 1][columnNum1 - 1].idx)
         }
         if (board[rowNum1 - 1][columnNum1 + 1] <= board[rowNum1 - 1][9]) {
-            arr1.push(board[rowNum1 - 1][columnNum1 + 1].idx)
+            fearedSqrs.push(board[rowNum1 - 1][columnNum1 + 1].idx)
         }
-        arr1.push(board[rowNum1 - 1][columnNum1].idx)
+        fearedSqrs.push(board[rowNum1 - 1][columnNum1].idx)
     }
     // add row below visually
     if (board[rowNum1 + 1] <= board[9]) {
         if (board[rowNum1 + 1][columnNum1 - 1] >= board[rowNum1 + 1][0]) {
-            arr1.push(board[rowNum1 + 1][columnNum1 - 1].idx)
+            fearedSqrs.push(board[rowNum1 + 1][columnNum1 - 1].idx)
         }
         if (board[rowNum1 + 1][columnNum1 + 1] <= board[rowNum1 + 1][9]) {
-            arr1.push(board[rowNum1 + 1][columnNum1 + 1].idx)
+            fearedSqrs.push(board[rowNum1 + 1][columnNum1 + 1].idx)
         } 
-        arr1.push(board[rowNum1 + 1][columnNum1].idx)
+        fearedSqrs.push(board[rowNum1 + 1][columnNum1].idx)
         
     }
     // add middle row
     if (board[rowNum1][columnNum1 + 1] <= board[rowNum1][9]) {
-            arr1.push(board[rowNum1][columnNum1 + 1].idx)
+            fearedSqrs.push(board[rowNum1][columnNum1 + 1].idx)
     }
     if (board[rowNum1][columnNum1 - 1] >= board[rowNum1][0]) {
-            arr1.push(board[rowNum1][columnNum1 - 1].idx) 
+            fearedSqrs.push(board[rowNum1][columnNum1 - 1].idx) 
     }
     // second feared animal
     // add row above visually
     if (board[rowNum2 - 1] >= board[0]) {
         if (board[rowNum2 - 1][columnNum2 - 1] >= board[rowNum2 - 1][0]) {
-            arr2.push(board[rowNum2 - 1][columnNum2 - 1].idx)
+            fearedSqrs.push(board[rowNum2 - 1][columnNum2 - 1].idx)
         }
         if (board[rowNum2 - 1][columnNum2 + 1] <= board[rowNum2 - 1][9]) {
-            arr2.push(board[rowNum2 - 1][columnNum2 + 1].idx)
+            fearedSqrs.push(board[rowNum2 - 1][columnNum2 + 1].idx)
         } 
-        arr2.push(board[rowNum2 - 1][columnNum2].idx)
+        fearedSqrs.push(board[rowNum2 - 1][columnNum2].idx)
         
     }
     // add row below visually
     if (board[rowNum2 + 1] <= board[9]) {
         if (board[rowNum2 + 1][columnNum2 - 1] >= board[rowNum2 + 1][0]) {
-            arr2.push(board[rowNum2 + 1][columnNum2 - 1].idx)
+            fearedSqrs.push(board[rowNum2 + 1][columnNum2 - 1].idx)
         }
         if (board[rowNum2 + 1][columnNum2 + 1] <= board[rowNum2 + 1][9]) {
-            arr2.push(board[rowNum2 + 1][columnNum2 + 1].idx)
+            fearedSqrs.push(board[rowNum2 + 1][columnNum2 + 1].idx)
         }
-        arr2.push(board[rowNum2 + 1][columnNum2].idx)
+        fearedSqrs.push(board[rowNum2 + 1][columnNum2].idx)
         
     }
     // add middle row
     if (board[rowNum2][columnNum2 + 1] <= board[rowNum2][9]) {
-            arr2.push(board[rowNum2][columnNum2 + 1].idx)
+            fearedSqrs.push(board[rowNum2][columnNum2 + 1].idx)
     }
     if (board[rowNum2][columnNum2 - 1] >= board[rowNum2][0]) {
-            arr2.push(board[rowNum2][columnNum2 - 1].idx) 
+            fearedSqrs.push(board[rowNum2][columnNum2 - 1].idx) 
     }
 
-    fearedSqrs = [...arr1, ...arr2]
     // return array of feared squares
-    return fearedSqrs
-       
+    return fearedSqrs  
 }
 
 // define possible moves for each selected piece
@@ -222,7 +390,7 @@ function possibleMoves(idx1, idx2) {
     let fearedSqrs
     let results = []
     let selectedPiece = board[idx1][idx2]
-
+    // check to see if a players piece is afraid
     // define possible moves for mice
     if (selectedPiece.piece === 'M' && selectedPiece.player === turn) {
         rowMoves = checkRow(idx1, selectedPiece)
@@ -251,11 +419,8 @@ function possibleMoves(idx1, idx2) {
         moves = [...rowMoves, ...columnMoves, ...diagonalMoves]
         results = moves.filter(ele => !fearedSqrs.includes(ele))
         results.forEach(element => document.getElementById(element).classList.add('move'))
-    }  
+    } 
 }
-
-
-
 
 /*----- functions -----*/
 initialize()
@@ -284,6 +449,7 @@ function createBoardArray() {
     let count = 0
     board.forEach(subArr => subArr.forEach(square => {
         square.idx = count
+        square.fear = null
         count++  
     }))
   }
@@ -417,8 +583,8 @@ function checkWinner() {
             }
         }
     } else if (oasis2.occupied && oasis2.player === turn) {
-        if (oasis3.occupied && oasis3.player === turn) {
-            if (oasis4.occupied && oasis4.player === turn) {
+        if (oasis3.occupied && oasis3.player ===  turn) {
+            if (oasis4.occupied && oasis4.player ===  turn) {
                 result = true
             }
         }
