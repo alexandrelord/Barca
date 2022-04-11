@@ -4,7 +4,7 @@ const player2 = -1
 
 /*----- app's state (variables) -----*/
 let board
-let turn = 1
+let turn = -1
 let currentPossibleMoves = []
 let selectedPiece
 /*----- cached element references -----*/
@@ -72,41 +72,6 @@ function move(evt, selectedPiece) {
     }
 }
 
-function winlogic() {
-    let oasis1 = board[3][3]
-    let oasis2 = board[3][6]
-    let oasis3 = board[6][3]
-    let oasis4 = board[6][6]
-
-    let result
-
-    if (oasis1.occupied && oasis1.player === turn) {
-        if (oasis2.occupied && oasis2.player === turn) {
-            if (oasis3.occupied && oasis3.player === turn) {
-                result = true
-            }
-        } else if (oasis3.occupied && oasis3.player === turn) {
-            if (oasis4.occupied && oasis4.player === turn) {
-                result = true
-            }
-        }
-    } else if (oasis2.occupied && oasis2.player === turn) {
-        if (oasis3.occupied && oasis3.player === turn) {
-            if (oasis4.occupied && oasis4.player === turn) {
-                result = true
-            }
-        }
-    }
-    
-    if (result === true) console.log(`Player${turn} wins!!`)
-    
-}
-
-function changeTurn() {
-    if (turn === 1) turn = -1
-    else turn = 1
-}
-
 function changeArrPosition(selectedPiece, destination) {
     let oldRow = selectedPiece[1]
     let oldColumn =  selectedPiece[2]
@@ -123,31 +88,140 @@ function changeArrPosition(selectedPiece, destination) {
     
 }
 
+function checkFearedPcs(piece) {
+    
+    if (piece === 'M') {
+        let oppLions = []
+        board.forEach(subArr => subArr.forEach(obj => {
+           if (obj.piece === 'L' && obj.player !== turn) {
+            oppLions.push(obj.idx)
+           }
+        }))
+        //console.log(oppLions)
+        return oppLions
+    } else if (piece === 'L') {
+        let oppElephants = []
+        board.forEach(subArr => subArr.forEach(obj => {
+            if (obj.piece === 'E' && obj.player !== turn) {
+             oppElephants.push(obj.idx)
+            }
+         }))
+         // console.log(oppElephants)
+         return oppElephants
+    } else {
+        let oppMice = []
+        board.forEach(subArr => subArr.forEach(obj => {
+            if (obj.piece === 'M' && obj.player !== turn) {
+             oppMice.push(obj.idx)
+            }
+         }))
+         // console.log(oppMice)
+         return oppMice
+    }
+
+}
+
+function activateFearSqr(fearedSqr) {
+    let arr1 = []
+    let arr2 = []
+    let fear = []
+    // fearedSqr is an array of idxs
+    let firstFeared = fearedSqr[0].toString()
+    let secondFeared = fearedSqr[1].toString()
+    
+    let rowNum1, columnNum1
+    if (parseInt(firstFeared) < 10) {
+        rowNum1 = 0
+        columnNum1 = parseInt(firstFeared)
+    } else {
+        rowNum1 = parseInt(firstFeared.charAt(0))
+        columnNum1 = parseInt(firstFeared.charAt(1))
+    }
+    let rowNum2, columnNum2
+    if (parseInt(secondFeared) < 10) {
+        rowNum2 = 0
+        columnNum2 = parseInt(secondFeared)
+    } else {
+        rowNum2 = parseInt(secondFeared.charAt(0))
+        columnNum2 = parseInt(secondFeared.charAt(1))
+    }
+    
+    //add row below
+    if (board[rowNum1 - 1] >= board[0]) {
+        arr1.push(board[rowNum1 - 1][columnNum1 - 1].idx, board[rowNum1 - 1][columnNum1].idx, board[rowNum1 - 1][columnNum1 + 1].idx)
+    }
+    // add row above
+    if (board[rowNum1 + 1] <= board[9]) {
+        arr1.push(board[rowNum1 + 1][columnNum1 - 1].idx, board[rowNum1 + 1][columnNum1].idx, board[rowNum1 + 1][columnNum1 + 1].idx)
+    }
+    // add middle row
+    if (board[rowNum1][columnNum1] <= board[rowNum1][9]) {
+        arr1.push(board[rowNum1][columnNum1 + 1].idx)
+    }
+    if (board[rowNum1][columnNum1] >= board[rowNum1][0]) {
+        arr1.push(board[rowNum1][columnNum1 - 1].idx)
+    }
+    //add row below
+    if (board[rowNum2 - 1] >= board[0]) {
+        arr2.push(board[rowNum2 - 1][columnNum2 - 1].idx, board[rowNum2 - 1][columnNum2].idx, board[rowNum2 - 1][columnNum2 + 1].idx)
+    }
+    // add row above
+    if (board[rowNum2 + 1] <= board[9]) {
+        arr2.push(board[rowNum2 + 1][columnNum2 - 1].idx, board[rowNum2 + 1][columnNum2].idx, board[rowNum2 + 1][columnNum2 + 1].idx)
+    }
+    // add middle row
+    if (board[rowNum2][columnNum2] <= board[rowNum2][9]) {
+        arr2.push(board[rowNum2][columnNum2 + 1].idx)
+    }
+    if (board[rowNum2][columnNum2] >= board[rowNum2][0]) {
+        arr2.push(board[rowNum2][columnNum2 - 1].idx)
+    }
+
+    fear = [...arr1, ...arr2]
+    // console.log(fear)
+    return fear
+       
+}
+
 
 function possibleMoves(idx1, idx2) {
     let rowMoves
     let columnMoves
     let diagonalMoves
     let moves
+    let fearedSqr
+    let fears
+    let results = []
     // if mouse - moves are up/down || left/right
     let pieceClicked = board[idx1][idx2]
     if (pieceClicked.piece === 'M' && pieceClicked.player === turn) {
         rowMoves = checkRow(idx1, pieceClicked)
         columnMoves = checkColumn(idx1, idx2)
-
+        fearedSqr = checkFearedPcs(pieceClicked.piece)
+        fears = activateFearSqr(fearedSqr)
         moves = [...rowMoves, ...columnMoves]
-        return moves
+        results = moves.filter(ele => !fears.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+        return results
     }
     if (pieceClicked.piece === 'L' && pieceClicked.player === turn) {
         diagonalMoves = checkDiagonals(pieceClicked)
-        return diagonalMoves
+        fearedSqr = checkFearedPcs(pieceClicked.piece)
+        fears = activateFearSqr(fearedSqr)
+        results = diagonalMoves.filter(ele => !fears.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+        return results
     }
     if (pieceClicked.piece === 'E' && pieceClicked.player === turn) {
         rowMoves = checkRow(idx1, pieceClicked)
         columnMoves = checkColumn(idx1, idx2)
         diagonalMoves = checkDiagonals(pieceClicked)
+        fearedSqr = checkFearedPcs(pieceClicked.piece)
+        fears = activateFearSqr(fearedSqr)
         moves = [...rowMoves, ...columnMoves, ...diagonalMoves]
-        return moves
+        results = moves.filter(ele => !fears.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+        return results
     }
     
 }
@@ -200,7 +274,7 @@ function checkDiagonals(pieceClicked) {
         else break
     }
 
-    diagonalMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    // diagonalMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return diagonalMoves
 }
 
@@ -219,7 +293,7 @@ function checkColumn(idx1, idx2) {
         } else break
     }
     // connect possible column moves to piece
-    columnMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    // columnMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return columnMoves
 }
             
@@ -241,7 +315,7 @@ function checkRow(idx1, pieceClicked) {
         else break
     }
     // connect possible row moves to piece
-    rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
+    // rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return rowMoves
 }
 
@@ -386,4 +460,39 @@ function convertId(evt) {
     }
     arrAxis.push(rowNum, columnNum)
     return arrAxis 
+}
+// check to see if there are at least 3 pieces from the same player on the oasis
+function winlogic() {
+    let oasis1 = board[3][3]
+    let oasis2 = board[3][6]
+    let oasis3 = board[6][3]
+    let oasis4 = board[6][6]
+
+    let result
+
+    if (oasis1.occupied && oasis1.player === turn) {
+        if (oasis2.occupied && oasis2.player === turn) {
+            if (oasis3.occupied && oasis3.player === turn) {
+                result = true
+            }
+        } else if (oasis3.occupied && oasis3.player === turn) {
+            if (oasis4.occupied && oasis4.player === turn) {
+                result = true
+            }
+        }
+    } else if (oasis2.occupied && oasis2.player === turn) {
+        if (oasis3.occupied && oasis3.player === turn) {
+            if (oasis4.occupied && oasis4.player === turn) {
+                result = true
+            }
+        }
+    }
+    
+    if (result === true) console.log(`Player${turn} wins!!`)
+    
+}
+// switch players when turn ends
+function changeTurn() {
+    if (turn === 1) turn = -1
+    else turn = 1
 }
