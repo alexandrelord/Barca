@@ -5,45 +5,17 @@ const player2 = -1
 /*----- app's state (variables) -----*/
 let board
 let turn = 1
+let squareIdEl
 let selectedPiece
 let fearedAnimals = []
+
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
 
 /*----- event listeners -----*/
 boardEl.addEventListener('click', handleClick)
 
-function handleClick(evt) {
-   
-    let squareIdEl = convertElId(evt)
-    let row = squareIdEl[0]
-    let column = squareIdEl[1]
-    fearedAnimals = checkFear()
 
-    if (fearedAnimals.length > 0) {
-        // limit selected pieces to afraid ones
-        fearedAnimals.forEach(animal => {
-            document.getElementById(animal).classList.add('fear')
-        })
-    } 
-        // let highlight = document.querySelectorAll('.fear')
-        // if (highlight) highlight.forEach(squareEl => squareEl.classList.remove('fear'))
-    
-
-    // check to see if clicked square has a selected player piece
-    if (board[row][column].occupied && board[row][column].player === turn) {
-        selectedPiece = [evt.target, row, column]
-        removeHighlight()
-        
-        addHighlight(selectedPiece)
-        possibleMoves(row, column)
-    }
-    // call move function if piece was selected
-    if (selectedPiece[0] !== evt.target) {
-        move(evt, selectedPiece)
-    } 
-    
-}
 
 function move(evt, selectedPiece) {
     let destination = convertElId(evt)
@@ -380,82 +352,39 @@ function activateFearSqr(fearedSqr) {
     return fearedSqrs  
 }
 
-// define possible moves for each selected piece
-function possibleMoves(idx1, idx2) {
-    let rowMoves
-    let columnMoves
-    let diagonalMoves
-    let moves
-    let fearedAnimalId
-    let fearedSqrs
-    let results = []
-    let selectedPiece = board[idx1][idx2]
-    // check to see if a players piece is afraid
-    // define possible moves for mice
-    if (selectedPiece.piece === 'M' && selectedPiece.player === turn) {
-        rowMoves = checkRow(idx1, selectedPiece)
-        columnMoves = checkColumn(idx1, idx2)
-        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
-        fearedSqrs = activateFearSqr(fearedAnimalId)
-        moves = [...rowMoves, ...columnMoves]
-        results = moves.filter(ele => !fearedSqrs.includes(ele))
-        results.forEach(element => document.getElementById(element).classList.add('move'))
-    }
-    // define possible moves for lions
-    if (selectedPiece.piece === 'L' && selectedPiece.player === turn) {
-        moves = checkDiagonals(selectedPiece)
-        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
-        fearedSqrs = activateFearSqr(fearedAnimalId)
-        results = moves.filter(ele => !fearedSqrs.includes(ele))
-        results.forEach(element => document.getElementById(element).classList.add('move'))
-    }
-    // define possible moves for elephants
-    if (selectedPiece.piece === 'E' && selectedPiece.player === turn) {
-        rowMoves = checkRow(idx1, selectedPiece)
-        columnMoves = checkColumn(idx1, idx2)
-        diagonalMoves = checkDiagonals(selectedPiece)
-        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
-        fearedSqrs = activateFearSqr(fearedAnimalId)
-        moves = [...rowMoves, ...columnMoves, ...diagonalMoves]
-        results = moves.filter(ele => !fearedSqrs.includes(ele))
-        results.forEach(element => document.getElementById(element).classList.add('move'))
-    } 
-}
-
 /*----- functions -----*/
 initialize()
-
+// call functions to initialize game
 function initialize() {
     createBoardArray()
-    setUpPieceEls()
+    defineAnimalObjs()
     renderBoard()
     renderOasis()
     renderPieces()
 }
-// find elegant method to create a multi-dimensional array
+// create and define board array
 function createBoardArray() {
-    board = [
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }],
-      [{ player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }, { player: null, piece: null, predator: null, pray: null, occupied: null }]
-    ]
+    // create an array with 10 nested arrays
+    board = [[], [], [], [], [], [], [], [], [], []]
+    // add 10 objects per subarray
+    board.forEach(subArray => {
+        for (let i = 0; i < 10; i ++) {
+            subArray.push({})
+        }
+    })
+    // add key/value pairs for every object
     let count = 0
-    board.forEach(subArr => subArr.forEach(square => {
-        square.idx = count
-        square.fear = null
-        count++  
+    board.forEach(subArray => subArray.forEach(object => {
+        object.idx = count
+        object.player = null
+        object.piece = null
+        object.occupied = null
+        object.fear = null
+        count++
     }))
-  }
-
-function setUpPieceEls() {
-    // copies properties from source object to target object => Object.assign(target, source)
+}
+// define animal objects in board array
+function defineAnimalObjs() {
     // Player 1
     Object.assign(board[0][4], {player: 1, piece: 'E', occupied: true})
     Object.assign(board[0][5], {player: 1, piece: 'E', occupied: true})
@@ -469,12 +398,9 @@ function setUpPieceEls() {
     Object.assign(board[8][3], {player: -1, piece: 'L', occupied: true})
     Object.assign(board[8][6], {player: -1, piece: 'L', occupied: true})
     Object.assign(board[8][4], {player: -1, piece: 'M', occupied: true})
-    Object.assign(board[8][5], {player: -1, piece: 'M', occupied: true})
-    
-
-    
+    Object.assign(board[8][5], {player: -1, piece: 'M', occupied: true}) 
 }
-
+// render board in DOM
 function renderBoard() {
     let counter = 0
     // create row elements
@@ -507,14 +433,14 @@ function renderBoard() {
     }
     
 }
-
+// render oasis on DOM board
 function renderOasis() {
     let oasisEls = [ document.getElementById('33'), document.getElementById('36'), document.getElementById('63'), document.getElementById('66')]
     oasisEls.forEach(oasisEl => {
         oasisEl.style.backgroundColor = '#2387bf'
     })   
 }
-// render pieces and add them to starting squares
+// render pieces on starting squares
 function renderPieces() {
     // player 1
     let blkElephantEls = [document.getElementById('4'), document.getElementById('5')]
@@ -531,14 +457,42 @@ function renderPieces() {
     let startWhiteMice = [document.getElementById('84'), document.getElementById('85')]
     startWhiteMice.forEach(ele => ele.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")')    
 }
-
+// remove highlight from piece and possible moves
 function removeHighlight() {
     const highlightPiece = document.querySelector('.highlight')
     const highLightMoves = document.querySelectorAll('.move')
     // remove highlight from selected piece before highlighting another
     if (highlightPiece) highlightPiece.classList.remove('highlight')
-    // remove highlight from possible squares selected piece can move to
+    // remove highlight from animals possible moves
     if (highLightMoves) highLightMoves.forEach(squareEl => squareEl.classList.remove('move'))
+}
+// handle clicked pieces and destination squares
+function handleClick(evt) {
+   
+    // convert square id element into array of numbers
+    squareIdEl = convertElId(evt)
+    let rowIdx = squareIdEl[0]
+    let columnIdx = squareIdEl[1]
+    // check if any animals are in a state of fear
+    fearedAnimals = checkFear()
+
+    if (fearedAnimals.length > 0) {
+        // limit selected pieces to afraid ones
+        fearedAnimals.forEach(animal => {
+            document.getElementById(animal).classList.add('fear')
+        })
+    }
+    // check to see if clicked square has a selected player piece
+    if (board[rowIdx][columnIdx].occupied && board[rowIdx][columnIdx].player === turn) {
+        selectedPiece = [evt.target, rowIdx, columnIdx]
+        removeHighlight()
+        addHighlight(selectedPiece)
+        possibleMoves(rowIdx, columnIdx)
+    }
+    // call move function if piece was selected
+    if (selectedPiece[0] !== evt.target) {
+        move(evt, selectedPiece)
+    } 
     
 }
 // highlight piece if clicked
@@ -550,19 +504,19 @@ function addHighlight(selectedPiece) {
         document.getElementById(selectedPiece[0].id).classList.add('highlight')
     }
 }
-// convert square ele id from string to num to access board array
+// convert square ele id from string to array of nums to access board array
 function convertElId(evt) {
-    let arrAxis = []
-    let rowNum, columnNum
+    let rowColumnIdx = []
+    let rowIdx, columnIdx
     if (parseInt(evt.target.id) < 10) {
-        rowNum = 0
-        columnNum = parseInt(evt.target.id)
+        rowIdx = 0
+        columnIdx = parseInt(evt.target.id)
     } else {
-        rowNum = parseInt(evt.target.id.charAt(0))
-        columnNum = parseInt(evt.target.id.charAt(1))
+        rowIdx = parseInt(evt.target.id.charAt(0))
+        columnIdx = parseInt(evt.target.id.charAt(1))
     }
-    arrAxis.push(rowNum, columnNum)
-    return arrAxis 
+    rowColumnIdx.push(rowIdx, columnIdx)
+    return rowColumnIdx 
 }
 // check to see if there are at least 3 pieces from the same player on the oasis
 function checkWinner() {
@@ -689,4 +643,46 @@ function checkRow(idx1, pieceClicked) {
     // connect possible row moves to piece
     // rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return rowMoves
+}
+
+// define possible moves for each selected piece
+function possibleMoves(idx1, idx2) {
+    let rowMoves
+    let columnMoves
+    let diagonalMoves
+    let moves
+    let fearedAnimalId
+    let fearedSqrs
+    let results = []
+    let selectedPiece = board[idx1][idx2]
+    // check to see if a players piece is afraid
+    // define possible moves for mice
+    if (selectedPiece.piece === 'M' && selectedPiece.player === turn) {
+        rowMoves = checkRow(idx1, selectedPiece)
+        columnMoves = checkColumn(idx1, idx2)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
+        moves = [...rowMoves, ...columnMoves]
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+    }
+    // define possible moves for lions
+    if (selectedPiece.piece === 'L' && selectedPiece.player === turn) {
+        moves = checkDiagonals(selectedPiece)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+    }
+    // define possible moves for elephants
+    if (selectedPiece.piece === 'E' && selectedPiece.player === turn) {
+        rowMoves = checkRow(idx1, selectedPiece)
+        columnMoves = checkColumn(idx1, idx2)
+        diagonalMoves = checkDiagonals(selectedPiece)
+        fearedAnimalId = findFearedAnimals(selectedPiece.piece)
+        fearedSqrs = activateFearSqr(fearedAnimalId)
+        moves = [...rowMoves, ...columnMoves, ...diagonalMoves]
+        results = moves.filter(ele => !fearedSqrs.includes(ele))
+        results.forEach(element => document.getElementById(element).classList.add('move'))
+    } 
 }
