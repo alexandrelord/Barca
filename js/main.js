@@ -13,6 +13,8 @@ let renderedBoard = false
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
 const resetBtnEl = document.querySelector('.button')
+const playerOneEl = document.querySelector('.one')
+const playerTwoEl = document.querySelector('.two')
 
 /*----- event listeners -----*/
 boardEl.addEventListener('click', handleClick)
@@ -25,6 +27,7 @@ function initialize() {
    // if board was already created
     if (renderedBoard) {
         clearBoard()
+        resetName()
         turn = 1
     }
     createBoardArray()
@@ -214,7 +217,7 @@ function checkWinner() {
                 result = true
         }
     }
-    if (result === true) turn === 1 ? console.log('Player 1 wins!!') : console.log('Player 2 wins!!')  
+    if (result === true) turn === 1 ? playerOneEl.innerText = 'WINNER!' :  playerTwoEl.innerText = 'WINNER!'
 }
 // switch players when turn ends
 function changeTurn() {
@@ -713,4 +716,9 @@ function clearBoard() {
         square.classList.remove('fear')
     })
     removeHighlight() 
+}
+
+function resetName() {
+    if (playerOneEl.innerText === 'WINNER!') playerOneEl.innerText = 'player one'
+    if (playerTwoEl.innerText === 'WINNER!') playerTwoEl.innerText = 'player two'
 }
