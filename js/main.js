@@ -8,6 +8,7 @@ let turn = 1
 let squareIdEl
 let selectedPiece
 let fearedAnimals = []
+let renderedBoard = false
 
 /*----- cached element references -----*/
 const boardEl = document.querySelector('.board')
@@ -19,8 +20,13 @@ resetBtnEl.addEventListener('click', initialize)
 
 /*----- functions -----*/
 initialize()
-// call functions to initialize game
+
 function initialize() {
+   // if board was already created
+    if (renderedBoard) {
+        clearBoard()
+        turn = 1
+    }
     createBoardArray()
     defineAnimalObjs()
     renderBoard()
@@ -69,6 +75,8 @@ function defineAnimalObjs() {
 // render board in DOM
 function renderBoard() {
     let counter = 0
+    // if board was already created, do not recreate it
+    if (renderedBoard) return
     // create row elements
     for (let i = 0; i < 10; ++i) {
         let row = document.createElement('div')
@@ -97,6 +105,7 @@ function renderBoard() {
         }
         document.querySelector('.board').appendChild(row)
     }
+    renderedBoard = true
     
 }
 // render oasis on DOM board
@@ -695,4 +704,13 @@ function activateFearSqr(fearedSqr) {
 
     // return array of feared squares
     return fearedSqrs  
+}
+
+function clearBoard() {
+    let squareEls = document.querySelectorAll('.square')
+    squareEls.forEach(square => {
+        square.style.backgroundImage = ''
+        square.classList.remove('fear')
+    })
+    removeHighlight() 
 }
