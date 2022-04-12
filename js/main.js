@@ -528,24 +528,18 @@ function checkWinner() {
 
     if (oasis1.occupied && oasis1.player === turn) {
         if (oasis2.occupied && oasis2.player === turn) {
-            if (oasis3.occupied && oasis3.player === turn) {
+            if ((oasis3.occupied && oasis3.player === turn) || (oasis4.occupied && oasis4.player === turn)) {
                 result = true
             }
-        } else if (oasis3.occupied && oasis3.player === turn) {
-            if (oasis4.occupied && oasis4.player === turn) {
+        } else if (oasis3.occupied && oasis3.player === turn && oasis4.occupied && oasis4.player === turn) {
                 result = true
-            }
         }
     } else if (oasis2.occupied && oasis2.player === turn) {
-        if (oasis3.occupied && oasis3.player ===  turn) {
-            if (oasis4.occupied && oasis4.player ===  turn) {
+        if ((oasis3.occupied && oasis3.player ===  turn) && (oasis4.occupied && oasis4.player === turn)) {
                 result = true
-            }
         }
     }
-    
-    if (result === true) turn === 1 ? console.log('Player 1 wins!!') : console.log('Player 2 wins!!')
-    
+    if (result === true) turn === 1 ? console.log('Player 1 wins!!') : console.log('Player 2 wins!!')  
 }
 // switch players when turn ends
 function changeTurn() {

@@ -18,22 +18,22 @@ body {
     /* flex-wrap: wrap; */
     width: 650px;
     height: 650px;
-    /* gap: 25px; */
-
+    /*background-color: purple;*/
 }
 
 .row {
     display: flex;
     width: 650px;
     height: 65px;
-    /* gap: 15px; */
+    /* column-gap: 2px; */
 }
 
 .square {
     display: inline-block;
     height: 65px;
     width: 65px;
-    /* border-radius: 5px; */
+    border-radius: 15px;
+    /* border: 2px solid #d9a420; */
     align-items: center;
     font-size: 65px;
     background-size: contain;
