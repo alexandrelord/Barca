@@ -1,44 +1,64 @@
-# Initial setup
 
-## Game name
-**Barca**
+# Barca
 
-#### Board setup
-* 10x10 grid
-* 4 watering holes
-* 6 tokens per player
-* 3 animals (Elephant(2), Lion(2), Mouse(2))
-* Players face each other with the board between them. The animals are separated into light and dark sets with twelve animals per set and two of each animal type in a set. The animals are arranged as shown in the diagram with the two elephants side by side in the center of the back row, the two mice in front of the two elephants, and the two lions separated on each side of the mice.
+Welcome to Barca, a game that at first sight might look like chess
 
-#### Gameplay
-* turn-base game
-* Players alternate turns moving one of their ainmals per turn
+<img src="img/readme/game.png" width="100%">
 
-##### General Movements
-* Mouse moves along rows and columns (ej. rook)
-* Lion moves on diagonals (ej. bishop)
-* Elephant moves along rows, columns and diagonals (ej. queen)
+The game was created using HTML, CSS, and Javascript.<br>
+click here to play!
 
-##### Movement Restrictions
-* Animals can move any number of squares on the board but cannot jump over other animals
-* A player's animals may occupy squares next to each other
-* An animal may not move to a square adjacent to an opposing animal that it fears
-* Squares adjacent to an animal include all those within one square of the animal, horizontally, vertically and diagonally.
-* An animal is said to be "afraid" when it is adjacent to an animal it fears. For example, if a player moves a lion adjacent to the opposing player's mouse, then that mouse becomes afraid.
-* On a player's turn, if any of the player's animals are afraid, then one of them must be moved to a square where it is not afraid, if possible.
-* An animal is said to be "trapped" if it is afraid and its only available moves still leave it afraid.
-* On a player's turn, if the player has one or more animals that are afraid, but all such animals are also trapped, then the player may optionally move a trapped animal to a square where it remains afraid. This is the only case in which an animal may move to a square in which it will be afraid.
+## History
 
-#### Winning
-* The four marked squares near the center of the board are the watering holes. The first player to get three of their animals on the watering holes at the same time wins the game. A player may win even if one or more of their animals remains afraid or trapped after the winning move.
+Barca is a two-player strategy board game invented by Andrew Caldwell. It is named after the Carthaginian military commander Hannibal Barca who attacked ancient Rome with an army that included war elephants.
+
+## General Gameplay
+
+* Barca is a two-player stategy game played on a 10x10 checkerboard. 
+* Each player controls 6 animals (2 elephants, 2 lions, and 2 mice).
+* Players alternate moving one of their ainmals per turn.
+* The goal of the game is to control 3 of the 4 oasis at the end of a turn.
 
 
-##### Afraid state
-* Each animal is afraid of one opposing animal
-* Elephant fears the mouse
-* Lion fears the elephant
-* Mouse fears the lion
+## Animal Movements
+* Mouse moves along rows and columns.
 
-## Icebox
-* Flip board for each player
-* add a timed game play
+<img src="img/readme/mouse_moves.png" width="300px">
+
+* Lion moves on diagonals.
+
+<img src="img/readme/lion_moves.png" width="300px">
+
+* Elephant moves along rows, columns and diagonals.
+
+<img src="img/readme/elephant_moves.png" width="300px">
+
+## Movement Restrictions
+* Animals can move any number of squares on the board but cannot jump over other animals.
+* A player's animals may occupy squares next to each other.
+* An animal may not move to a square adjacent to an opposing animal that it fears. Squares adjacent to an animal include all those within one square of the animal; horizontally, vertically and diagonally.
+
+<img src="img/readme/fear_one.png" width="300px">
+
+* An animal is said to be scared when it is adjacent to an animal it fears. For example, if a player moves a lion adjacent to the opposing player's mouse, then that mouse becomes scared.
+
+* On a player's turn, if any of the player's animals are scared, then one of them must be moved to a safe square, if possible.
+
+<img src="img/readme/fear_two.png" width="300px">
+
+
+## Scared Animals
+* Each animal is afraid of one opposing animal type.
+* The elephant fears the mouse.
+* The lion fears the elephant.
+* The mouse fears the lion.
+
+
+## Winning
+* The four blue squares near the center of the board are the oasis. The first player to get three of their animals on the oasis at the end of their turn wins.
+
+## Future Updates
+* Flip board on a player's turn.
+* Add timed game play.
+* Add visual rules next to game.
+* 
