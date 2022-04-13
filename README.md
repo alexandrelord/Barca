@@ -1,7 +1,11 @@
 
 # Barca
 
+<<<<<<< HEAD
 Welcome to Barca! This ain't chess.
+=======
+Welcome to Barca! This ain't chess!
+>>>>>>> e30ae2dbb17a2316c8c1fa9a3fa0acc52dccb21f
 
 <img src="img/readme/game.png" width="100%"> <br>
 
@@ -59,8 +63,15 @@ Barca is a two-player strategy board game invented by Andrew Caldwell. It is nam
 * The four blue squares near the center of the board are the oasis. The first player to get three of their animals on the oasis at the end of their turn wins.
 
 ## Future Updates
+<<<<<<< HEAD
 
 - [ ] Flip board on a player's turn.
 - [ ] Add timed game play.
 - [ ] Add visual rules next to game.
 - [ ] Add responsive web design.
+=======
+* Flip board on a player's turn.
+* Add timed game play.
+* Add visual rules next to game.
+* 
+>>>>>>> e30ae2dbb17a2316c8c1fa9a3fa0acc52dccb21f
