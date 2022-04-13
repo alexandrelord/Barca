@@ -1,10 +1,10 @@
 /*----- constants -----*/
-const player1 = 1
-const player2 = -1
+const playerOne = 1
+const playerTwo = -1
 
 /*----- app's state (variables) -----*/
 let board
-let turn = 1
+let turn
 let squareIdEl
 let selectedPiece
 let fearedAnimals = []
@@ -24,11 +24,12 @@ resetBtnEl.addEventListener('click', initialize)
 initialize()
 
 function initialize() {
+    turn = 1
+
    // if board was already created
     if (renderedBoard) {
         clearBoard()
         resetName()
-        turn = 1
     }
     createBoardArray()
     defineAnimalObjs()
@@ -41,7 +42,7 @@ function initialize() {
 function createBoardArray() {
     // create an array with 10 nested arrays
     board = [[], [], [], [], [], [], [], [], [], []]
-    // add 10 objects per subarray
+    // add 10 objects per nested array
     board.forEach(subArray => {
         for (let i = 0; i < 10; i ++) {
             subArray.push({})
@@ -108,10 +109,11 @@ function renderBoard() {
         }
         document.querySelector('.board').appendChild(row)
     }
+    // set value to true after creating board
     renderedBoard = true
     
 }
-// render oasis on DOM board
+// render oasis
 function renderOasis() {
     let oasisEls = [ document.getElementById('33'), document.getElementById('36'), document.getElementById('63'), document.getElementById('66')]
     oasisEls.forEach(oasisEl => {
@@ -122,25 +124,25 @@ function renderOasis() {
 function renderPieces() {
     // player 1
     let blkElephantEls = [document.getElementById('4'), document.getElementById('5')]
-    blkElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/ELEFANTE.png")')
+    blkElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_elephant.png")')
     let blkLionEls = [document.getElementById('13'), document.getElementById('16')]
-    blkLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/LEON.png")')
+    blkLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_lion.png")')
     let blkMouseEls = [document.getElementById('14'), document.getElementById('15')]
-    blkMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/RATON.png")')
+    blkMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_mouse.png")')
     // player 2
-    let startWhiteEles = [document.getElementById('94'), document.getElementById('95')]
-    startWhiteEles.forEach(ele => ele.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")')
-    let startWhiteLions = [document.getElementById('83'), document.getElementById('86')]
-    startWhiteLions.forEach(ele => ele.style.backgroundImage = 'url("img/white/LEON_BLANCO.png")')
-    let startWhiteMice = [document.getElementById('84'), document.getElementById('85')]
-    startWhiteMice.forEach(ele => ele.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")')    
+    let redElephantEls = [document.getElementById('94'), document.getElementById('95')]
+    redElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_elephant.png")')
+    let redLionEls = [document.getElementById('83'), document.getElementById('86')]
+    redLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_lion.png")')
+    let redMouseEls = [document.getElementById('84'), document.getElementById('85')]
+    redMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_mouse.png")')    
 }
 // remove highlight from piece and possible moves
 function removeHighlight() {
-    const highlightPiece = document.querySelector('.highlight')
+    const highlightAnimalEl = document.querySelector('.highlight')
     const highLightMoves = document.querySelectorAll('.move')
     // remove highlight from selected piece before highlighting another
-    if (highlightPiece) highlightPiece.classList.remove('highlight')
+    if (highlightAnimalEl) highlightAnimalEl.classList.remove('highlight')
     // remove highlight from animals possible moves
     if (highLightMoves) highLightMoves.forEach(squareEl => squareEl.classList.remove('move'))
 }
@@ -224,18 +226,18 @@ function changeTurn() {
     turn === 1 ? turn = -1 : turn = 1
     showPlayerTurn()
 }
-
+// show player turn in DOM
 function showPlayerTurn() {
     if (turn === 1) {
-        document.querySelector('.one').style.border = '5px solid black'
-        document.querySelector('.one').style.borderRadius = '15px'
-        document.querySelector('.two').style.border = ''
-        document.querySelector('.two').style.borderRadius = ''
+        playerOneEl.style.border = '5px solid black'
+        playerOneEl.style.borderRadius = '15px'
+        playerTwoEl.style.border = ''
+        playerTwoEl.style.borderRadius = ''
     } else {
-        document.querySelector('.one').style.border = ''
-        document.querySelector('.one').style.borderRadius = ''
-        document.querySelector('.two').style.border = '5px solid #922d03'
-        document.querySelector('.two').style.borderRadius = '15px'
+        playerTwoEl.style.border = '5px solid #922d03'
+        playerTwoEl.style.borderRadius = '15px'
+        playerOneEl.style.border = ''
+        playerOneEl.style.borderRadius = ''
     }
 }
 
@@ -376,31 +378,30 @@ function possibleMoves(idx1, idx2) {
 
 function move(evt, selectedPiece) {
     let destination = convertElId(evt)
-    
-    let x = selectedPiece[1]
-    let y = selectedPiece[2]
+    let rowIdx = selectedPiece[1]
+    let columnIdx = selectedPiece[2]
 
     if (evt.target.classList.contains('move')) {
         // for player 1
-        if (board[x][y].piece === 'E' && turn === 1) {
-        evt.target.style.backgroundImage = 'url("img/black/ELEFANTE.png")'
+        if (board[rowIdx][columnIdx].piece === 'E' && turn === 1) {
+        evt.target.style.backgroundImage = 'url("img/black/black_elephant.png")'
         selectedPiece[0].style.backgroundImage = ''
-        } else if (board[x][y].piece === 'L' && turn === 1) {
-            evt.target.style.backgroundImage = 'url("img/black/LEON.png")'
+        } else if (board[rowIdx][columnIdx].piece === 'L' && turn === 1) {
+            evt.target.style.backgroundImage = 'url("img/black/black_lion.png")'
             selectedPiece[0].style.backgroundImage = ''
-        } else if (board[x][y].piece === 'M' && turn === 1) {
-            evt.target.style.backgroundImage = 'url("img/black/RATON.png")'
+        } else if (board[rowIdx][columnIdx].piece === 'M' && turn === 1) {
+            evt.target.style.backgroundImage = 'url("img/black/black_mouse.png")'
             selectedPiece[0].style.backgroundImage = ''
         }
         // for player 2
-        if (board[x][y].piece === 'E' &&  turn === -1) {
-            evt.target.style.backgroundImage = 'url("img/white/ELEFANTE_BLANCO.png")'
+        if (board[rowIdx][columnIdx].piece === 'E' &&  turn === -1) {
+            evt.target.style.backgroundImage = 'url("img/red/red_elephant.png")'
             selectedPiece[0].style.backgroundImage = ''
-            } else if (board[x][y].piece === 'L' &&  turn === -1) {
-                evt.target.style.backgroundImage = 'url("img/white/LEON_BLANCO.png")'
+            } else if (board[rowIdx][columnIdx].piece === 'L' &&  turn === -1) {
+                evt.target.style.backgroundImage = 'url("img/red/red_lion.png")'
                 selectedPiece[0].style.backgroundImage = ''
-            } else if (board[x][y].piece === 'M' &&  turn === -1) {
-                evt.target.style.backgroundImage = 'url("img/white/RATON_BLANCO.png")'
+            } else if (board[rowIdx][columnIdx].piece === 'M' &&  turn === -1) {
+                evt.target.style.backgroundImage = 'url("img/red/red_mouse.png")'
                 selectedPiece[0].style.backgroundImage = ''
             }
             
@@ -410,20 +411,17 @@ function move(evt, selectedPiece) {
         addFear(destination)
         checkWinner()
         changeTurn()
-        // check feared
-        //fearedAnimals = checkFear()
     }
 }
 // check fear property
 function checkFear() {
-    let afraidAnimals = []
+    let scaredAnimals = []
     board.forEach(subArr => subArr.forEach(obj => {
         if (obj.fear === true) {
-            afraidAnimals.push(obj.idx)
+            scaredAnimals.push(obj.idx)
         }
     }))
-    
-    return afraidAnimals
+    return scaredAnimals
 }
 
 
@@ -572,7 +570,7 @@ function addFear(destination) {
 }
 
 
-
+// change the array position of the animal that was recently moved
 function changeArrPosition(selectedPiece, destination) {
     let oldRow = selectedPiece[1]
     let oldColumn =  selectedPiece[2]

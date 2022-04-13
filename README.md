@@ -1,12 +1,12 @@
 
 # Barca
 
-Welcome to Barca, a game that at first sight might look like chess
+Welcome to Barca! This ain't chess.
 
 <img src="img/readme/game.png" width="100%"> <br>
 
 The game was created using HTML, CSS, and Javascript.<br>
-Click [here](https://alexandrelord.github.io/barca/) to play!
+Click <a href="https://alexandrelord.github.io/barca/" target="_blank">here</a> to play!
 
 ## History
 
@@ -22,15 +22,15 @@ Barca is a two-player strategy board game invented by Andrew Caldwell. It is nam
 ## Rules
 
 ### Animal Movements
-Mouse moves along rows and columns.
+* Mouse moves along rows and columns.
 
 <img src="img/readme/mouse_moves.png" width="300px">
 
-Lion moves on diagonals.
+* Lion moves on diagonals.
 
 <img src="img/readme/lion_moves.png" width="300px">
 
-Elephant moves along rows, columns and diagonals.
+* Elephant moves along rows, columns and diagonals.
 
 <img src="img/readme/elephant_moves.png" width="300px">
 
@@ -59,7 +59,8 @@ Elephant moves along rows, columns and diagonals.
 * The four blue squares near the center of the board are the oasis. The first player to get three of their animals on the oasis at the end of their turn wins.
 
 ## Future Updates
-* Flip board on a player's turn.
-* Add timed game play.
-* Add visual rules next to game.
-* 
+
+- [ ] Flip board on a player's turn.
+- [ ] Add timed game play.
+- [ ] Add visual rules next to game.
+- [ ] Add responsive web design.
