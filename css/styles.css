@@ -15,19 +15,29 @@ body {
   background-color: #fffaed;
   display: grid;
   grid-template-columns: 300px 750px;
-  grid-template-rows: auto 750px;
+  grid-template-rows: 200px 750px 50px;
   grid-template-areas:
     ". header"
-    "players board";
+    "players board"
+    ". footer";
 }
 
 header {
   grid-area: header;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   margin-top: 20px;
+}
+
+header > div {
+  font-size: 70px;
+}
+
+h1 {
+  font-size: 80px;
 }
 
 .players {
@@ -59,10 +69,6 @@ header {
 .button:hover {
   border: 5px solid #f07922;
   color: #f07922;
-}
-
-h1 {
-  font-size: 80px;
 }
 
 .board {
@@ -102,4 +108,16 @@ h1 {
 
 .fear {
   border: 8px solid red;
+}
+
+footer {
+  grid-area: footer;
+  text-align: right;
+  font-size: 30px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+a {
+  color: black;
 }
