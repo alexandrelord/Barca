@@ -1,16 +1,12 @@
 
 # Barca
 
-Welcome to Barca! This ain't chess.
+Welcome to Barca!
 
 <img src="img/readme/game.png" width="100%"> <br>
 
 The game was created using HTML, CSS, and Javascript.<br>
 Click <a href="https://alexandrelord.github.io/barca/" target="_blank">here</a> to play!
-
-## History
-
-Barca is a two-player strategy board game invented by Andrew Caldwell. It is named after the Carthaginian military commander Hannibal Barca who attacked ancient Rome with an army that included war elephants.
 
 ## General Gameplay
 
@@ -63,4 +59,4 @@ Barca is a two-player strategy board game invented by Andrew Caldwell. It is nam
 - [ ] Flip board on a player's turn.
 - [ ] Add timed game play.
 - [ ] Add visual rules next to game.
-- [ ] Add responsive web design.
+- [X] Add responsive web design.
