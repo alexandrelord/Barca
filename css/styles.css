@@ -10,12 +10,12 @@
 }
 
 body {
-  max-height: 100vh;
+  
   font-family: "rhino-sans";
   background-color: #fffaed;
   display: grid;
-  grid-template-columns: 300px 750px;
-  grid-template-rows: 200px 750px 50px;
+  grid-template-columns: 30vh 75vh;
+  grid-template-rows: 20vh 75vh 5vh;
   grid-template-areas:
     ". header"
     "players board"
@@ -24,20 +24,17 @@ body {
 
 header {
   grid-area: header;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-header > div {
-  font-size: 70px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
 }
 
 h1 {
-  font-size: 80px;
+  font-size: 8vh;
+}
+
+header > div {
+  font-size: 7vh;
 }
 
 .players {
@@ -45,12 +42,12 @@ h1 {
   display: flex;
   flex-direction: column;
   font-family: "rhino-sans";
-  font-size: 70px;
+  font-size: 6vh;
 
   text-align: center;
   justify-content: center;
-  margin-left: 40px;
-  margin-right: 40px;
+  margin-left: 4vh;
+  margin-right: 4vh;
   justify-content: space-between;
   cursor: default;
 }
@@ -61,34 +58,30 @@ h1 {
 
 .button {
   color: purple;
-  padding: 15px;
-  border: 5px solid purple;
-  border-radius: 15px;
+  border: 0.5vh solid purple;
+  border-radius: 1.5vh;
+  padding: 1.5vh;
 }
 
 .button:hover {
-  border: 5px solid #f07922;
+  border: 0.5vh solid #f07922;
   color: #f07922;
 }
 
 .board {
   grid-area: board;
   display: inline-block;
-  width: 100%;
-  height: 100%;
 }
 
 .row {
   display: flex;
-  width: 750px;
-  height: 75px;
 }
 
 .square {
   display: inline-block;
-  height: 75px;
-  width: 75px;
-  border-radius: 15px;
+  height: 7.5vh;
+  width: 7.5vh;
+  border-radius: 1.5vh;
   align-items: center;
   background-size: contain;
 }
@@ -98,24 +91,24 @@ h1 {
 }
 
 .highlight {
-  border: 3px solid purple;
+  border: 0.3vh solid purple;
 }
 
 .move {
   background-image: url("../img/moves/purple_dot.png");
-  border: 3px solid purple;
+  border: 0.3vh solid purple;
 }
 
 .fear {
-  border: 8px solid red;
+  border: 0.8vh solid red;
 }
 
 footer {
   grid-area: footer;
   text-align: right;
-  font-size: 30px;
-  margin-right: 10px;
-  margin-top: 10px;
+  font-size: 3vh;
+  margin-right: 1vh;
+  margin-top: 1vh;
 }
 
 a {
