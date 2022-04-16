@@ -229,13 +229,13 @@ function changeTurn() {
 // show player turn in DOM
 function showPlayerTurn() {
     if (turn === 1) {
-        playerOneEl.style.border = '5px solid black'
-        playerOneEl.style.borderRadius = '15px'
+        playerOneEl.style.border = '0.5vh solid black'
+        playerOneEl.style.borderRadius = '1.5vh'
         playerTwoEl.style.border = ''
         playerTwoEl.style.borderRadius = ''
     } else {
-        playerTwoEl.style.border = '5px solid #922d03'
-        playerTwoEl.style.borderRadius = '15px'
+        playerTwoEl.style.border = '0.5vh solid #922d03'
+        playerTwoEl.style.borderRadius = '1.5vh'
         playerOneEl.style.border = ''
         playerOneEl.style.borderRadius = ''
     }

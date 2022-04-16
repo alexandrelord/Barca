@@ -9,6 +9,8 @@
   src: url("../font/rhino-sans/RHINO_SANS.ttf");
 }
 
+/*----- body -----*/
+
 body {
   font-family: "rhino-sans";
   background-color: #fffaed;
@@ -20,6 +22,8 @@ body {
     "players board"
     ". footer";
 }
+
+/*----- header -----*/
 
 header {
   grid-area: header;
@@ -36,13 +40,14 @@ header > div {
   font-size: 7vh;
 }
 
+/*----- main/side -----*/
+
 .players {
   grid-area: players;
   display: flex;
   flex-direction: column;
   font-family: "rhino-sans";
   font-size: 6vh;
-
   text-align: center;
   justify-content: center;
   margin-left: 4vh;
@@ -51,7 +56,7 @@ header > div {
   cursor: default;
 }
 
-.two {
+.players .two {
   color: #922d03;
 }
 
@@ -67,9 +72,10 @@ header > div {
   color: #f07922;
 }
 
+/*----- main/board -----*/
+
 .board {
   grid-area: board;
-  display: inline-block;
 }
 
 .row {
@@ -77,7 +83,6 @@ header > div {
 }
 
 .square {
-  display: inline-block;
   height: 7.5vh;
   width: 7.5vh;
   border-radius: 1.5vh;
@@ -101,6 +106,8 @@ header > div {
 .fear {
   border: 0.8vh solid red;
 }
+
+/*----- footer -----*/
 
 footer {
   grid-area: footer;
