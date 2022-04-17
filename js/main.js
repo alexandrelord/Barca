@@ -107,35 +107,34 @@ function renderBoard() {
             row.appendChild(square)
             counter++
         }
-        document.querySelector('.board').appendChild(row)
+        boardEl.appendChild(row)
     }
     // set value to true after creating board
     renderedBoard = true
     
 }
-// render oasis
+// render oasis elements
 function renderOasis() {
-    let oasisEls = [ document.getElementById('33'), document.getElementById('36'), document.getElementById('63'), document.getElementById('66')]
-    oasisEls.forEach(oasisEl => {
-        oasisEl.style.backgroundColor = '#2387bf'
-    })   
+   [document.getElementById('33'), document.getElementById('36'), 
+   document.getElementById('63'), document.getElementById('66')].forEach(oasisEl => oasisEl.style.backgroundColor = '#2387bf')
+       
 }
-// render pieces on starting squares
+// render animals on starting squares
 function renderPieces() {
     // player 1
     let blkElephantEls = [document.getElementById('4'), document.getElementById('5')]
-    blkElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_elephant.png")')
+    blkElephantEls.forEach(square => square.style.backgroundImage = 'url("img/black/black_elephant.png")')
     let blkLionEls = [document.getElementById('13'), document.getElementById('16')]
-    blkLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_lion.png")')
+    blkLionEls.forEach(square => square.style.backgroundImage = 'url("img/black/black_lion.png")')
     let blkMouseEls = [document.getElementById('14'), document.getElementById('15')]
-    blkMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/black/black_mouse.png")')
+    blkMouseEls.forEach(square => square.style.backgroundImage = 'url("img/black/black_mouse.png")')
     // player 2
     let redElephantEls = [document.getElementById('94'), document.getElementById('95')]
-    redElephantEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_elephant.png")')
+    redElephantEls.forEach(square => square.style.backgroundImage = 'url("img/red/red_elephant.png")')
     let redLionEls = [document.getElementById('83'), document.getElementById('86')]
-    redLionEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_lion.png")')
+    redLionEls.forEach(square => square.style.backgroundImage = 'url("img/red/red_lion.png")')
     let redMouseEls = [document.getElementById('84'), document.getElementById('85')]
-    redMouseEls.forEach(ele => ele.style.backgroundImage = 'url("img/red/red_mouse.png")')    
+    redMouseEls.forEach(square => square.style.backgroundImage = 'url("img/red/red_mouse.png")')    
 }
 // remove highlight from piece and possible moves
 function removeHighlight() {
@@ -329,8 +328,6 @@ function checkRow(idx1, pieceClicked) {
         }
         else break
     }
-    // connect possible row moves to piece
-    // rowMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return rowMoves
 }
 
