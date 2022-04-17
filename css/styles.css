@@ -46,10 +46,8 @@ header > div {
   grid-area: players;
   display: flex;
   flex-direction: column;
-  font-family: "rhino-sans";
   font-size: 6vh;
   text-align: center;
-  justify-content: center;
   margin-left: 4vh;
   margin-right: 4vh;
   justify-content: space-between;

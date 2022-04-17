@@ -5,7 +5,7 @@ const playerTwo = -1
 /*----- app's state (variables) -----*/
 let board
 let turn
-let squareIdEl
+let sqrElIdx
 let selectedPiece
 let fearedAnimals = []
 let renderedBoard = false
@@ -136,37 +136,21 @@ function renderPieces() {
     let redMouseEls = [document.getElementById('84'), document.getElementById('85')]
     redMouseEls.forEach(square => square.style.backgroundImage = 'url("img/red/red_mouse.png")')    
 }
-// remove highlight from piece and possible moves
-function removeHighlight() {
-    const highlightAnimalEl = document.querySelector('.highlight')
-    const highLightMoves = document.querySelectorAll('.move')
-    // remove highlight from selected piece before highlighting another
-    if (highlightAnimalEl) highlightAnimalEl.classList.remove('highlight')
-    // remove highlight from animals possible moves
-    if (highLightMoves) highLightMoves.forEach(squareEl => squareEl.classList.remove('move'))
-}
+
 // handle clicked pieces and destination squares
 function handleClick(evt) {
    
     // convert square id element into array of numbers
-    squareIdEl = convertElId(evt)
-    let rowIdx = squareIdEl[0]
-    let columnIdx = squareIdEl[1]
-    // check if any animals are in a state of fear
-    fearedAnimals = checkFear()
+    sqrElIdx = convertElId(evt)
+    let rowIdx = sqrElIdx[0]
+    let columnIdx = sqrElIdx[1]
 
-    if (fearedAnimals.length > 0) {
-        // limit selected pieces to afraid ones
-        fearedAnimals.forEach(animal => {
-            document.getElementById(animal).classList.add('fear')
-        })
-    }
-    // check to see if clicked square has a selected player piece
-    if (board[rowIdx][columnIdx].occupied && board[rowIdx][columnIdx].player === turn) {
+    // check to see if clicked square has a player's animal
+    if (board[rowIdx][columnIdx].player === turn) {
         selectedPiece = [evt.target, rowIdx, columnIdx]
         removeHighlight()
-        addHighlight(selectedPiece)
-        possibleMoves(rowIdx, columnIdx)
+        document.getElementById(evt.target.id).classList.add('highlight')
+        findPossibleMoves(rowIdx, columnIdx)
     }
     // call move function if piece was selected
     if (selectedPiece[0] !== evt.target) {
@@ -174,15 +158,22 @@ function handleClick(evt) {
     } 
     
 }
-// highlight piece if clicked
-function addHighlight(selectedPiece) {
-    let row = selectedPiece[1]
-    let column = selectedPiece[2]
-    let arrObj = board[row][column]
-    if (arrObj.piece && arrObj.player === turn) {
-        document.getElementById(selectedPiece[0].id).classList.add('highlight')
-    }
+
+// remove all highlights
+function removeHighlight() {
+    let hglAnimalEl = document.querySelector('.highlight')
+    let hglMovesEl = document.querySelectorAll('.move')
+    // remove highlight from selected piece before highlighting another
+    if (hglAnimalEl) hglAnimalEl.classList.remove('highlight')
+    // remove highlight from animal's possible moves
+    if (hglMovesEl) hglMovesEl.forEach(squareEl => squareEl.classList.remove('move'))
 }
+
+// // highlight square when player's animal is clicked
+// function addHighlight(selectedPiece, d) {
+//     document.getElementById(selectedPiece[0].id).classList.add('highlight')
+// }
+
 // convert square ele id from string to array of nums to access board array
 function convertElId(evt) {
     let rowColumnIdx = []
@@ -288,7 +279,6 @@ function checkDiagonals(pieceClicked) {
         else break
     }
 
-    // diagonalMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return diagonalMoves
 }
 
@@ -306,8 +296,6 @@ function checkColumn(idx1, idx2) {
             columnMoves.push(board[i][idx2].idx)
         } else break
     }
-    // connect possible column moves to piece
-    // columnMoves.forEach(element => document.getElementById(element).classList.add('move'))
     return columnMoves
 }
             
@@ -332,7 +320,7 @@ function checkRow(idx1, pieceClicked) {
 }
 
 // define possible moves for each selected piece
-function possibleMoves(idx1, idx2) {
+function findPossibleMoves(idx1, idx2) {
     let rowMoves
     let columnMoves
     let diagonalMoves
@@ -341,9 +329,8 @@ function possibleMoves(idx1, idx2) {
     let fearedSqrs
     let results = []
     let selectedPiece = board[idx1][idx2]
-    // check to see if a players piece is afraid
     // define possible moves for mice
-    if (selectedPiece.piece === 'M' && selectedPiece.player === turn) {
+    if (selectedPiece.piece === 'M') {
         rowMoves = checkRow(idx1, selectedPiece)
         columnMoves = checkColumn(idx1, idx2)
         fearedAnimalId = findFearedAnimals(selectedPiece.piece)
@@ -353,7 +340,7 @@ function possibleMoves(idx1, idx2) {
         results.forEach(element => document.getElementById(element).classList.add('move'))
     }
     // define possible moves for lions
-    if (selectedPiece.piece === 'L' && selectedPiece.player === turn) {
+    if (selectedPiece.piece === 'L') {
         moves = checkDiagonals(selectedPiece)
         fearedAnimalId = findFearedAnimals(selectedPiece.piece)
         fearedSqrs = activateFearSqr(fearedAnimalId)
@@ -361,7 +348,7 @@ function possibleMoves(idx1, idx2) {
         results.forEach(element => document.getElementById(element).classList.add('move'))
     }
     // define possible moves for elephants
-    if (selectedPiece.piece === 'E' && selectedPiece.player === turn) {
+    if (selectedPiece.piece === 'E') {
         rowMoves = checkRow(idx1, selectedPiece)
         columnMoves = checkColumn(idx1, idx2)
         diagonalMoves = checkDiagonals(selectedPiece)
@@ -404,169 +391,98 @@ function move(evt, selectedPiece) {
             
         removeHighlight()
         changeArrPosition(selectedPiece, destination)
-        // instigate feared state to nearby animal
-        addFear(destination)
         checkWinner()
         changeTurn()
+        checkFear()
+        showFear()
     }
 }
-// check fear property
-function checkFear() {
-    let scaredAnimals = []
+// show animals in state of fear
+function showFear() {
     board.forEach(subArr => subArr.forEach(obj => {
-        if (obj.fear === true) {
-            scaredAnimals.push(obj.idx)
+        if (obj.fear) {
+            document.getElementById(obj.idx).classList.add('fear')
+        } else {
+            document.getElementById(obj.idx).classList.remove('fear')
         }
     }))
-    return scaredAnimals
 }
+// check if current player's animals have opposing feared animals on adjacent sqrs
+function checkFear() {
 
+    let adjacentSqrs = [{x: 1, y: -1}, {x: 1, y: 0}, {x: 1, y: 1}, {x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: -1}, {x: -1, y: 0}, {x: -1, y: 1}]
+    let adjacentX
+    let adjacentY
+    let miceSqrs = []
+    let elephantSqrs = []
+    let lionSqrs = []
+    
+    // find all player's animals and save the idxs in an array
+    board.forEach(subArr => subArr.forEach(obj => {
+        if (obj.piece === 'M' && obj.player === turn) {
+            let MiceObj = {x: board.indexOf(subArr), y: subArr.indexOf(obj)}
+            miceSqrs.push(MiceObj)
+        }
+        if (obj.piece === 'L' && obj.player === turn) {
+            let lionObj = {x: board.indexOf(subArr), y: subArr.indexOf(obj)}
+            lionSqrs.push(lionObj)
+        }
+        if (obj.piece === 'E' && obj.player === turn) {
+            let elephantObj = {x: board.indexOf(subArr), y: subArr.indexOf(obj)}
+            elephantSqrs.push(elephantObj)
+        }
+    }))
+    // reset all feared states to null before checking adjacent sqrs
+    for (let i = 0; i < 2; i++) {
+        board[miceSqrs[i].x][miceSqrs[i].y].fear = null
+        board[lionSqrs[i].x][lionSqrs[i].y].fear = null
+        board[elephantSqrs[i].x][elephantSqrs[i].y].fear = null
+    }
+    
+    // loop over mouse positions and check if feared animal can be found on adjacent sqrs
+    for (let i = 0; i < 2; i ++) {
+        for (let j = 0; j < 8; j++) {
+            adjacentX =  miceSqrs[i].x + adjacentSqrs[j].x
+            adjacentY = miceSqrs[i].y + adjacentSqrs[j].y
 
-// add fear property to animal
-function addFear(destination) {
-    let row = destination[0]
-    let column = destination[1]
-    let piece = board[row][column].piece
-    // check for animals that fear the moved piece
-    // next to adjacent destination squares
-    // add row above
-    if (piece === 'M') {
-        // if row exist
-        if (board[row - 1] >= board[0]) {
-            //and square is not out of bounds
-            if (board[row - 1][column - 1] >= board[row - 1][0]) {
-                if (board[row - 1][column - 1].piece === 'E' && board[row - 1][column - 1].player !== turn) {
-                    board[row - 1][column - 1].fear = true
+            if (adjacentX > 0 && adjacentY > 0 && adjacentX < 9 && adjacentY < 9) {
+                if (board[adjacentX][adjacentY].piece === 'L' && board[adjacentX][adjacentY].player !== turn) {
+                    board[miceSqrs[i].x][miceSqrs[i].y].fear = true
                 }
-            }
-            if (board[row - 1][column + 1] <= board[row - 1][9]) {
-                if (board[row - 1][column + 1].piece === 'E' && board[row - 1][column + 1].player !== turn) {
-                    board[row - 1][column + 1].fear = true
-                }
-            }
-            if (board[row - 1][column].piece === 'E' && board[row - 1][column].player !== turn) {
-                board[row - 1][column].fear = true
+                if (board[miceSqrs[i].x][miceSqrs[i].y].fear) break
             }
         }
-        // add row below
-        if (board[row + 1] <= board[9]) {
-            if (board[row + 1][column - 1] >= board[row + 1][0]) {
-                if (board[row + 1][column - 1].piece === 'E' && board[row + 1][column - 1].player !== turn) {
-                    board[row + 1][column - 1].fear = true
+        // if (!board[miceSqrs[i].x][miceSqrs[i].y].fear) document.getElementById(board[miceSqrs[i].x][miceSqrs[i].y].idx).classList.remove('fear')
+    }
+    // loop over lion positions and check if feared animal can be found on adjacent sqrs
+    for (let i = 0; i < 2; i ++) {
+        for (let j = 0; j < 8; j++) {
+            adjacentX =  lionSqrs[i].x + adjacentSqrs[j].x
+            adjacentY = lionSqrs[i].y + adjacentSqrs[j].y
+
+            if (adjacentX > 0 && adjacentY > 0 && adjacentX < 9 && adjacentY < 9) {
+                if (board[adjacentX][adjacentY].piece === 'E' && board[adjacentX][adjacentY].player !== turn) {
+                    board[lionSqrs[i].x][lionSqrs[i].y].fear = true  
                 }
+                if (board[lionSqrs[i].x][lionSqrs[i].y].fear) break
             }
-            if (board[row + 1][column + 1] <= board[row + 1][9]) {
-                if (board[row + 1][column + 1].piece === 'E' && board[row + 1][column + 1].player !== turn) {
-                    board[row + 1][column + 1].fear = true
+        }
+    }
+    // loop over elephant positions and check if feared animal can be found on adjacent sqrs
+    for (let i = 0; i < 2; i ++) {
+        for (let j = 0; j < 8; j++) {
+            adjacentX =  elephantSqrs[i].x + adjacentSqrs[j].x
+            adjacentY = elephantSqrs[i].y + adjacentSqrs[j].y
+
+            if (adjacentX > 0 && adjacentY > 0 && adjacentX < 9 && adjacentY < 9) {
+                if (board[adjacentX][adjacentY].piece === 'M' && board[adjacentX][adjacentY].player !== turn) {
+                    board[elephantSqrs[i].x][elephantSqrs[i].y].fear = true  
                 }
-            }
-            if (board[row + 1][column].piece === 'E' && board[row + 1][column].player !== turn) {
-                board[row + 1][column].fear = true
+                if (board[elephantSqrs[i].x][elephantSqrs[i].y].fear) break
             }
         }
-        if (board[row][column + 1] <= board[row][9]) {
-            if (board[row][column + 1].piece === 'E' && board[row][column + 1].player !== turn) {
-                board[row][column + 1].fear = true
-            }
-        }
-        if (board[row][column - 1] >= board[row][0]) {
-            if (board[row][column - 1].piece === 'E' && board[row][column - 1].player !== turn) {
-                board[row][column - 1].fear = true
-            }
-        }
-    } 
-    if (piece === 'L') {
-        // if row exist
-        if (board[row - 1] >= board[0]) {
-            //and square is not out of bounds
-            if (board[row - 1][column - 1] >= board[row - 1][0]) {
-                if (board[row - 1][column - 1].piece === 'M' && board[row - 1][column - 1].player !== turn) {
-                    board[row - 1][column - 1].fear = true
-                }
-            }
-            if (board[row - 1][column + 1] <= board[row - 1][9]) {
-                if (board[row - 1][column + 1].piece === 'M' && board[row - 1][column + 1].player !== turn) {
-                    board[row - 1][column + 1].fear = true
-                }
-            }
-            if (board[row - 1][column].piece === 'M' && board[row - 1][column].player !== turn) {
-                board[row - 1][column].fear = true
-            }
-        }
-        // add row below
-        if (board[row + 1] <= board[9]) {
-            if (board[row + 1][column - 1] >= board[row + 1][0]) {
-                if (board[row + 1][column - 1].piece === 'M' && board[row + 1][column - 1].player !== turn) {
-                    board[row + 1][column - 1].fear = true
-                }
-            }
-            if (board[row + 1][column + 1] <= board[row + 1][9]) {
-                if (board[row + 1][column + 1].piece === 'M' && board[row + 1][column + 1].player !== turn) {
-                    board[row + 1][column + 1].fear = true
-                }
-            }
-            if (board[row + 1][column].piece === 'M' && board[row + 1][column].player !== turn) {
-                board[row + 1][column].fear = true
-            }
-        }
-        if (board[row][column + 1] <= board[row][9]) {
-            if (board[row][column + 1].piece === 'M' && board[row][column + 1].player !== turn) {
-                board[row][column + 1].fear = true
-            }
-        }
-        if (board[row][column - 1] >= board[row][0]) {
-            if (board[row][column - 1].piece === 'M' && board[row][column - 1].player !== turn) {
-                board[row][column - 1].fear = true
-            }
-        }
-    } if (piece === 'E') {
-        // if row exist
-        if (board[row - 1] >= board[0]) {
-            //and square is not out of bounds
-            if (board[row - 1][column - 1] >= board[row - 1][0]) {
-                if (board[row - 1][column - 1].piece === 'L' && board[row - 1][column - 1].player !== turn) {
-                    board[row - 1][column - 1].fear = true
-                }
-            }
-            if (board[row - 1][column + 1] <= board[row - 1][9]) {
-                if (board[row - 1][column + 1].piece === 'L' && board[row - 1][column + 1].player !== turn) {
-                    board[row - 1][column + 1].fear = true
-                }
-            }
-            if (board[row - 1][column].piece === 'L' && board[row - 1][column].player !== turn) {
-                board[row - 1][column].fear = true
-            }
-        }
-        // add row below
-        if (board[row + 1] <= board[9]) {
-            if (board[row + 1][column - 1] >= board[row + 1][0]) {
-                if (board[row + 1][column - 1].piece === 'L' && board[row + 1][column - 1].player !== turn) {
-                    board[row + 1][column - 1].fear = true
-                }
-            }
-            if (board[row + 1][column + 1] <= board[row + 1][9]) {
-                if (board[row + 1][column + 1].piece === 'L' && board[row + 1][column + 1].player !== turn) {
-                    board[row + 1][column + 1].fear = true
-                }
-            }
-            if (board[row + 1][column].piece === 'L' && board[row + 1][column].player !== turn) {
-                board[row + 1][column].fear = true
-            }
-        }
-        if (board[row][column + 1] <= board[row][9]) {
-            if (board[row][column + 1].piece === 'L' && board[row][column + 1].player !== turn) {
-                board[row][column + 1].fear = true
-            }
-        }
-        if (board[row][column - 1] >= board[row][0]) {
-            if (board[row][column - 1].piece === 'L' && board[row][column - 1].player !== turn) {
-                board[row][column - 1].fear = true
-            }
-        }
-    } 
+    }
 }
-
-
 // change the array position of the animal that was recently moved
 function changeArrPosition(selectedPiece, destination) {
     let oldRow = selectedPiece[1]
